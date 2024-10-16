@@ -93,10 +93,10 @@ SUBROUTINE diagnostics(diag_num)
       print*, '______________________________________'
       !print*, 'Total current squared', t, diag_sumj(diag_num)
       print*, 'Time', diag_time(diag_num)
-      print*, 'Open Flux', diag_oflux(diag_num)
+      !print*, 'Open Flux', diag_oflux(diag_num)
       print*, 'Total Current', diag_sumj(diag_num)
-      print*, 'Average Current', diag_avgj(diag_num)
-      print*, 'Magnetic Energy', diag_energy(diag_num)
+      !print*, 'Average Current', diag_avgj(diag_num)
+      !print*, 'Magnetic Energy', diag_energy(diag_num)
 
     end if
 

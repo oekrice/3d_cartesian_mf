@@ -131,6 +131,9 @@ SUBROUTINE allocate_arrays()
 
     allocate(lf(0:nx,0:ny,0:nz)); allocate(b2(0:nx,0:ny,0:nz)); allocate(nu(0:nx,0:ny,0:nz))
     allocate(soft(0:nx,0:ny,0:nz))
+
+    allocate(bz_surf_reference(0:nx+1,0:ny+1))
+
     !allocate(fy(0:nx+1,0:ny))
     !allocate(vpx(-2:nx+2,-2:ny+2)); allocate(vpy(-2:nx+2,-2:ny+2)); !allocate(vpz(-2:nx+2,-2:ny+2))
     !allocate(jpz1(-2:nx+2,-2:ny+2))

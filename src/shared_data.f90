@@ -43,7 +43,7 @@ MODULE shared_data
     INTEGER:: nx_global, nx
     INTEGER:: ny_global, ny
     INTEGER:: nz_global, nz
-    INTEGER:: nt
+    INTEGER:: nt, n
     REAL(num):: dx, dy, dz
     REAL(num):: t, dt
     REAL(num), DIMENSION(:), ALLOCATABLE :: xs, ys, zs, xc, yc, zc
@@ -89,6 +89,8 @@ MODULE shared_data
     INTEGER:: x_rank, y_rank, z_rank
     INTEGER:: x_up, y_up, z_up, x_down, y_down, z_down
 
+    !Extras
+    REAL(num), DIMENSION(:,:), ALLOCATABLE:: bz_surf_reference
 !*******************************************************************************
 END MODULE shared_data
 !*******************************************************************************

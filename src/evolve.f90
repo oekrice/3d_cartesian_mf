@@ -15,7 +15,6 @@ CONTAINS
 
 SUBROUTINE timestep()
 
-
     !New timestep with a quasi-implicit bit. Using a predictor for the magnfield of the new bit but not the old
     CALL calculate_magnetic()
 
@@ -63,11 +62,17 @@ SUBROUTINE magnetic_boundary()
     IMPLICIT NONE
 
     CALL bfield_mpi()
+
+    !If first step, establish reference magnetic field
+
     CALL MPI_BARRIER(comm,ierr)
 
     !Boundary conditions on the magnetic field.
     !Uses the no-horizontal-current condition for the first ghost cells and then the solenoidal condition for the next lot.
 
+    !PROBLEM WITH CORNERS!
+
+    if (.false.) then  !Zero current boundaries
     !LOWER BOUNDARY (Zero current)
     if (z_rank == 0) then
     by(0:nx+1,0:ny,0) = by(0:nx+1,0:ny,1) - dz*(bz(0:nx+1,1:ny+1,0) - bz(0:nx+1, 0:ny,0))/dy
@@ -102,16 +107,60 @@ SUBROUTINE magnetic_boundary()
     bx(0:nx,ny+1,0:nz+1) = bx(0:nx,ny,0:nz+1) + dy*(by(1:nx+1,ny,0:nz+1) - by(0:nx, ny,0:nz+1))/dx
     end if
 
+    end if
+
+    !x boundaries (Zero current, and zero flux)
+    if (x_rank == 0) then
+      bx(-1,:,:) = 0.0_num
+      by( 0,:,:) = by(1,:,:)
+      bz( 0,:,:) = bz(1,:,:)
+    end if
+
+    if (x_rank == x_procs-1) then
+      bx(nx+1,:,:) = 0.0_num
+      by(nx+1,:,:) = by(nx  ,:,:)
+      bz(nx+1,:,:) = bz(nx  ,:,:)
+    end if
+
+    !y boundaries (Zero current, and zero flux)
+    if (y_rank == 0) then
+      bx(:, 0,:) = bx(:,1,:)
+      by(:,-1,:) = 0.0_num
+      bz(:, 0,:) = bz(:,1,:)
+    end if
+
+    if (y_rank == y_procs-1) then
+
+    bx(:,ny+1,:) = bx(:,ny  ,:)
+      by(:,ny+1,:) = 0.0_num
+      bz(:,ny+1,:) = bz(:,ny  ,:)
+
+    end if
+
+    if (z_rank == 0) then
+    bx(:,:, 0) = bx(:,:,1)
+      by(:,:, 0) = by(:,:,1)
+      bz(:,:,-1) = bz(:,:,1)
+
+    end if
+
+    !UPPER BOUNDARY (Zero Current)
+    if (z_rank == z_procs-1) then
+      bx(:,:,nz+1) = bx(:,:,nz  )
+      by(:,:,nz+1) = by(:,:,nz  )
+      bz(:,:,nz+1) = bz(:,:,nz-1)
+    end if
+
     CALL MPI_BARRIER(comm,ierr)
 
     !_________________________________________________
     !Solenoidal condition, using the above information
     !Isn't necessary to do more MPI here, I suppose. So I won't.
 
-    !LOWER BOUNDARY (Zero current)
+    !LOWER BOUNDARY
     bz(0:nx+1,0:ny+1,-1) = (1.0_num/(dx*dy))*(bz(0:nx+1,0:ny+1,0)*dx*dy - bx(-1:nx,0:ny+1,0)*dy*dz + bx(0:nx+1,0:ny+1,0)*dy*dz - by(0:nx+1,-1:ny,0)*dx*dz + by(0:nx+1,0:ny+1,0)*dx*dz)
 
-    !UPPER BOUNDARY (Zero Current)
+    !UPPER BOUNDARY
     bz(0:nx+1,0:ny+1,nz+1) = (1.0_num/(dx*dy))*(bz(0:nx+1,0:ny+1,nz)*dx*dy + bx(-1:nx,0:ny+1,nz+1)*dy*dz - bx(0:nx+1,0:ny+1,nz+1)*dy*dz + by(0:nx+1,-1:ny,nz+1)*dx*dz - by(0:nx+1,0:ny+1,nz+1)*dx*dz)
 
     !x boundaries (Zero current, and zero flux)
@@ -121,12 +170,13 @@ SUBROUTINE magnetic_boundary()
 
     bx(nx+1,0:ny+1,0:nz+1) = (1.0_num/(dy*dz))*(bx(nx,0:ny+1,0:nz+1)*dy*dz + by(nx+1,-1:ny,0:nz+1)*dx*dz - by(nx+1,0:ny+1,0:nz+1)*dx*dz + bz(nx+1,0:ny+1,-1:nz)*dx*dy - bz(nx+1,0:ny+1,0:nz+1)*dx*dy)
 
-
     !y boundaries (Zero current, and zero flux)
     by(0:nx+1,-1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,0,0:nz+1)*dx*dz - bx(-1:nx,0,0:nz+1)*dy*dz + bx(0:nx+1,0,0:nz+1)*dy*dz - bz(0:nx+1,0,-1:nz)*dx*dy + bz(0:nx+1,0,0:nz+1)*dx*dy)
 
 
     by(0:nx+1,ny+1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,ny,0:nz+1)*dx*dz + bx(-1:nx,ny+1,0:nz+1)*dy*dz - bx(0:nx+1,ny+1,0:nz+1)*dy*dz + bz(0:nx+1,ny+1,-1:nz)*dx*dy - bz(0:nx+1,ny+1,0:nz+1)*dx*dy)
+
+    if (n== 0) bz_surf_reference(0:nx+1,0:ny+1) = bz(0:nx+1,0:ny+1,0)
 
 END SUBROUTINE magnetic_boundary
 
@@ -155,7 +205,7 @@ END SUBROUTINE j_to_gridpts
 
 SUBROUTINE b_to_gridpts
     !Averages the magnetic field to raw grid points
-    !Need to average in two dimension
+    !Need to average in two dimensions
     IMPLICIT NONE
     bx1(0:nx,0:ny,0:nz) = 0.25_num*(bx(0:nx,0:ny,0:nz) + bx(0:nx,1:ny+1,0:nz) + bx(0:nx,0:ny,1:nz+1) + bx(0:nx,1:ny+1,1:nz+1))
     by1(0:nx,0:ny,0:nz) = 0.25_num*(by(0:nx,0:ny,0:nz) + by(1:nx+1,0:ny,0:nz) + by(0:nx,0:ny,1:nz+1) + by(1:nx+1,0:ny,1:nz+1))
@@ -195,25 +245,26 @@ SUBROUTINE add_boundary_flows()
     real(num), dimension(:,:):: fact(0:nx+1,0:ny+1), fact0(0:nx,0:ny)
 
     if (z_down < 0) then
-        br = 13.0_num; bl = 0.1_num; kb = 15.0_num
+    br = 13.0_num; bl = 0.1_num; kb = 15.0_num
 
-        bzdy = (bz(0:nx+1,1:ny+1,0) - bz(0:nx+1,0:ny,0)) / dy
-        bzdx = (bz(1:nx+1,0:ny+1,0) - bz(0:nx,0:ny+1,0)) / dx
+      bzdy = (bz_surf_reference(0:nx+1,1:ny+1) - bz_surf_reference(0:nx+1,0:ny)) / dy
+      bzdx = (bz_surf_reference(1:nx+1,0:ny+1) - bz_surf_reference(0:nx,0:ny+1)) / dx
 
-        bzdy0 = 0.5_num*(bzdy(1:nx+1,0:ny) + bzdy(0:nx,0:ny))
-        bzdx0 = 0.5_num*(bzdx(0:nx,1:ny+1) + bzdx(0:nx,0:ny))
+      bzdy0 = 0.5_num*(bzdy(1:nx+1,0:ny) + bzdy(0:nx,0:ny))
+      bzdx0 = 0.5_num*(bzdx(0:nx,1:ny+1) + bzdx(0:nx,0:ny))
 
-        fact = (kb*(br-bl))/(bz(0:nx+1,0:ny+1,0) + 1d-10)*tanh(kb*(bz(0:nx+1,0:ny+1,0)- bl)/(br-bl))
-        fact0 = 0.25_num*(fact(0:nx,0:ny) + fact(1:nx+1,0:ny) + fact(0:nx,1:ny+1) + fact(1:nx+1, 1:ny+1))
+      fact = (kb*(br-bl))/(bz_surf_reference(0:nx+1,0:ny+1) + 1d-10)*tanh(kb*(bz_surf_reference(0:nx+1,0:ny+1)- bl)/(br-bl+1d-10))
+      fact0 = 0.25_num*(fact(0:nx,0:ny) + fact(1:nx+1,0:ny) + fact(0:nx,1:ny+1) + fact(1:nx+1, 1:ny+1))
 
-        fact0(0,:) = 0.0_num; fact0(nx,:) = 0.0_num
-        fact0(:,0) = 0.0_num; fact0(:,ny) = 0.0_num
-        vx_surf(0:nx, 0:ny) = -fact0*bzdy0
-        vy_surf(0:nx, 0:ny) = fact0*bzdx0
+      vx_surf(0:nx, 0:ny) = -fact0*bzdy0
+      vy_surf(0:nx, 0:ny) = fact0*bzdx0
 
-        vx(:,:,0) = vx(:,:,0) + shearfact*vx_surf
-        vy(:,:,0) = vy(:,:,0) + shearfact*vy_surf
+      vx(0:nx,0:ny,0) = shearfact*vx_surf
+      vy(0:nx,0:ny,0) = shearfact*vy_surf
+
+
     end if
+
 
 END SUBROUTINE add_boundary_flows
 
@@ -243,22 +294,21 @@ SUBROUTINE calculate_electric()
 
     if (eta > 0) then
         !Determine the current from the magnetic field (after boundary conditions etc.)
-        ex(1:nx, 0:ny,0:nz) = ex(1:nx, 0:ny,0:nz) + eta*jx(1:nx, 0:ny,0:nz)
-        ey(0:nx, 1:ny,0:nz) = ey(0:nx, 1:ny,0:nz) + eta*jy(0:nx, 1:ny,0:nz)
+        ex(1:nx, 0:ny,1:nz) = ex(1:nx, 0:ny,1:nz) + eta*jx(1:nx, 0:ny,1:nz)
+        ey(0:nx, 1:ny,1:nz) = ey(0:nx, 1:ny,1:nz) + eta*jy(0:nx, 1:ny,1:nz)
         ez(0:nx, 0:ny,1:nz) = ez(0:nx, 0:ny,1:nz) + eta*jz(0:nx, 0:ny,1:nz)
     end if
 
-    if (nu0 > 0) then  !There is some magnetofriction. Use existing velocity field to calculate electric field.
-        ex1 = vz*by1 - vy*bz1
-        ey1 = vx*bz1 - vz*bx1
-        ez1 = vy*bx1 - vx*by1
 
-        !Average to Ribs (interior only):
-        ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz)  + 0.5_num*(ex1(0:nx-1,0:ny,0:nz) + ex1(1:nx,0:ny,0:nz))
-        ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)  + 0.5_num*(ey1(0:nx,0:ny-1,0:nz) + ey1(0:nx,1:ny,0:nz))
-        ez(0:nx,0:ny,1:nz) = ez(0:nx,0:ny,1:nz)  + 0.5_num*(ez1(0:nx,0:ny,0:nz-1) + ez1(0:nx,0:ny,1:nz))
+    ex1 = vz*by1 - vy*bz1
+    ey1 = vx*bz1 - vz*bx1
+    ez1 = vy*bx1 - vx*by1
 
-    end if
+    !Average to Ribs (interior only):
+    ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz)  + 0.5_num*(ex1(0:nx-1,0:ny,0:nz) + ex1(1:nx,0:ny,0:nz))
+    ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)  + 0.5_num*(ey1(0:nx,0:ny-1,0:nz) + ey1(0:nx,1:ny,0:nz))
+    ez(0:nx,0:ny,1:nz) = ez(0:nx,0:ny,1:nz)  + 0.5_num*(ez1(0:nx,0:ny,0:nz-1) + ez1(0:nx,0:ny,1:nz))
+
 
 
 

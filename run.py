@@ -25,20 +25,20 @@ hflag = 0
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
 voutfact = 0.0
-shearfact = 0.0
+shearfact = 5e-4
 eta0 = 0.0
 
-tmax = 1.0
+tmax = 600.0
 
 nx = 64
 ny = 64
 nz = 64
 
-nplots = 10
+nplots = 600
 ndiags = 10
 
-nu0 = 0.0
-eta = 1.0
+nu0 = 1.0
+eta = 1e-4
 
 x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0
@@ -160,7 +160,7 @@ class Grid():
         self.ys = np.linspace(self.y0,self.y1,self.ny+1)
         self.zs = np.linspace(self.z0,self.z1,self.nz+1)
 
-if False:
+if True:
     grid= Grid()
     init = compute_initial_condition(grid, lbound_pariat, run, background_strength = 1.0, boundary_error_limit = 1e-6, init_filename = './inits/init%03d.nc' % run)
 
@@ -174,7 +174,7 @@ if False:
 
         plt.quiver(grid.xs,grid.ys,vx_surf.T,vy_surf.T)
         plt.show()
-    trace_fieldlines(Grid(),bx,by,bz)
+    #trace_fieldlines(Grid(),bx,by,bz)
 
 #RUN CODE
 #-------------------------------------
