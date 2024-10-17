@@ -24,7 +24,7 @@ SUBROUTINE initialise()
 
     CALL calculate_timestep()
 
-    !CALL set_outflow()
+    CALL set_outflow()
 
     !CALL set_shearing()
 
@@ -172,8 +172,6 @@ SUBROUTINE establish_grid()
       write (init_filename, "(A12, I3, A3)") './inits/init', int(run_number), '.nc'
     end if
 
-    print*, trim(init_filename)
-
     call try(nf90_open(trim(init_filename), nf90_nowrite, ncid))
 
     call try(nf90_inq_varid(ncid, 'ax', vid))
@@ -275,21 +273,25 @@ SUBROUTINE set_outflow()
     ! Set the outflow arrays vout and voutc, the sizes of which are declared in shared variables
     ! vouts is on gridpoints (like az), voutc is on x ribs (like ax). To allow for upwinding
     ! Need to take care with all this...
-    !INTEGER:: i, j
-    !REAL(num):: hfact
+    INTEGER:: i, j, k
+    REAL(num):: hfact
 
-    !allocate(vouts(-2:nx+2,-2:ny+2))
-    !allocate(voutc(-1:nx+2,-2:ny+2))
+    allocate(voutx(0:nx+1,-1:ny+1,-1:nz+1))  !Outflow combining with ex
+    allocate(vouty(-1:nx+1,0:ny+1,-1:nz+1))  !Outflow combining with ey
 
-    !do j = 0, ny
-        !hfact = (ys(j) - ys(0))/(ys(ny) - ys(0))   !Distance up the domain
-        !do i = -2, nx+2
-        !    vouts(i,j) = voutfact*hfact**10
-        !end do
-        !do i = -1, nx+2
-        !    voutc(i,j) = voutfact*hfact**10
-        !end do
-    !end do
+    do k = -1, nz+1
+        hfact = (zs(k) - zs(0))/(zs(nz) - zs(0))   !Distance up the domain
+        do i = 0, nx+1
+            do j = -1, ny+1
+                voutx(i,j,k) = voutfact*hfact**2
+            end do
+        end do
+        do i = -1, nx+1
+            do j = 0, ny+1
+                vouty(i,j,k) = voutfact*hfact**2
+            end do
+        end do
+    end do
 
 END SUBROUTINE set_outflow
 

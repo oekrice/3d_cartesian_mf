@@ -56,7 +56,6 @@ MODULE shared_data
 
     REAL(num), DIMENSION(:,:), ALLOCATABLE :: vx_surf, vy_surf
 
-    REAL(num), DIMENSION(:,:,:), ALLOCATABLE:: vouts, voutc
     REAL(num), DIMENSION(:), ALLOCATABLE:: vz0
 
     !Temporary arrays that it's probably just quicker to overwrite each time...
@@ -66,6 +65,8 @@ MODULE shared_data
 
     REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: vx, vy, vz
     REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: lf, b2, soft, nu
+
+    REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: voutx, vouty
 
     !Extra arrays for the pressure bits
     REAL(num), DIMENSION(:,:), ALLOCATABLE :: fy

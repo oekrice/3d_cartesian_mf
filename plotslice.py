@@ -121,6 +121,13 @@ for plot_num in range(0,nsnaps,1):
     jy[:,1:-1,:] = np.swapaxes(data.variables['jy'][:],0,2)
     jz[:,:,1:-1] = np.swapaxes(data.variables['jz'][:],0,2)
 
+    ex = np.zeros((nx+2,ny+1,nz+1))
+    ey = np.zeros((nx+1,ny+2,nz+1))
+    ez = np.zeros((nx+1,ny+1,nz+2))
+
+    ex[1:-1,:,:] = np.swapaxes(data.variables['ex'][:],0,2)
+    ey[:,1:-1,:] = np.swapaxes(data.variables['ey'][:],0,2)
+    ez[:,:,1:-1] = np.swapaxes(data.variables['ez'][:],0,2)
 
     data.close()
 
@@ -130,11 +137,11 @@ for plot_num in range(0,nsnaps,1):
         bz1 = 0.5*(bz[1:-1,slice_index,1:] + bz[1:-1,slice_index,:-1])
         return 0.5*(bx1**2 + by1**2+ bz1**2)
 
-    if False:
+    if True:
         trace_fieldlines(Grid(),bx,by,bz,save=plot_num,plot_vista = False, plot_notvista = True)
 
     if True:
-        fig, axs = plt.subplots(2,4, figsize = (10,4))
+        fig, axs = plt.subplots(3,4, figsize = (10,7))
 
         def find_a(bx, bz):   #find the vector potential a from the (hopefully) divergence-free magnetic fields
             a = np.zeros((nx, nz))
@@ -166,7 +173,6 @@ for plot_num in range(0,nsnaps,1):
         plt.colorbar(im, ax=axs[0,3])
         axs[0,3].set_title('Surface Bz')
 
-
         im = axs[1,0].pcolormesh(xs,zc,jx[1:-1,slice_index,1:-1].T)
         plt.colorbar(im, ax=axs[1,0])
         axs[1,0].set_title('Current jx')
@@ -179,6 +185,17 @@ for plot_num in range(0,nsnaps,1):
         plt.colorbar(im, ax=axs[1,2])
         axs[1,2].set_title('Current jz')
 
+        im = axs[2,0].pcolormesh(xs,zc,ex[1:-1,slice_index,1:-1].T)
+        plt.colorbar(im, ax=axs[2,0])
+        axs[2,0].set_title('Efield ex')
+
+        im = axs[2,1].pcolormesh(xc,zc,ey[1:-1,slice_index,1:-1].T)
+        plt.colorbar(im, ax=axs[2,1])
+        axs[2,1].set_title('Efield ey')
+
+        im = axs[2,2].pcolormesh(xc,zs,ez[1:-1,slice_index,1:-1].T)
+        plt.colorbar(im, ax=axs[2,2])
+        axs[2,2].set_title('Efield ez')
 
         plt.tight_layout()
         #plt.show()

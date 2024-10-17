@@ -36,7 +36,7 @@ PREPROFLAGS = $(DEFINES) $(D)_COMMIT='"$(COMMIT)"' $(D)_DATE=$(DATE) \
   $(D)_MACHINE='"$(MACHINE)"'
 
 
-SRCFILES = shared_data.o mpi_tools.o evolve.o init.o output.o main.o
+SRCFILES = shared_data.o mpi_tools.o boundary.o evolve.o init.o output.o main.o
 
 OBJFILES := $(SRCFILES:.f90=.o)
 OBJFILES := $(OBJFILES:.F90=.o)
@@ -89,5 +89,6 @@ evolve.o: evolve.f90 shared_data.o mpi_tools.o
 init.o: init.f90 shared_data.o mpi_tools.o
 output.o: output.f90 shared_data.o
 main.o: main.f90 shared_data.o init.o evolve.o
+boundary.o: boundary.f90 shared_data.o mpi_tools.o
 
 

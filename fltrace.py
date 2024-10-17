@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-import pyvista as pv
-import vtk
+import os
+
+if os.uname()[1] == 'brillouin.dur.ac.uk':
+    import pyvista as pv
 
 class trace_fieldlines():
-    def __init__(self, grid, bx,by,bz,save = -1,plot_vista = False):
+    def __init__(self, grid, bx,by,bz,save = -1,plot_vista = True,plot_notvista=False):
         print('Tracing field lines...')
         self.xs = np.linspace(grid.x0,grid.x1,grid.nx+1)
         self.ys = np.linspace(grid.y0,grid.y1,grid.ny+1)
@@ -63,7 +65,7 @@ class trace_fieldlines():
                 for j in range(nthetas):
                     self.starts.append([ris[i]*np.cos(tjs[j]),ris[i]*np.sin(tjs[j]),self.z1-1e-6])
             #And from the bottom (for the interior ones only)
-            nrs = 20; nthetas = 10
+            nrs = 20; nthetas = 2
             ris = np.linspace(0.5*self.x0/nrs,self.x0-0.5*self.x0/nrs,nrs)
             tjs = np.linspace(0+1e-6,2*np.pi*(1-1/nthetas),nthetas)
             for i in range(nrs):
@@ -83,8 +85,7 @@ class trace_fieldlines():
             if doplot:
                 self.lines.append(line)
 
-        if not plot_vista:
-            print('Plotting using matplotlib')
+        if plot_notvista:
             #Don't use pyvista, just the normal thing
             plt.figure().add_subplot(projection='3d')
             for line in self.lines:
@@ -95,16 +96,14 @@ class trace_fieldlines():
             plt.gca().set_zlim(self.z0, self.z1)
 
             if save >= 0:
-                plt.savefig('plots/%4d.png' % save)
-                plt.show()
+                plt.savefig('plots/b%04d.png' % save)
+                plt.close()
 
             else:
                 plt.show()
 
-        else:
+        elif plot_vista:
             #Do use pyvista
-            print('Plotting using pyvista')
-
             x, y = np.meshgrid(self.xs, self.ys)
             z = 0*x*y
             surface = pv.StructuredGrid(x, y, z)
@@ -116,12 +115,12 @@ class trace_fieldlines():
                 p.add_mesh(pv.Spline(line, len(line)),color='white')
 
 
-            p.camera.position = (0,2.0,1.0)
+            #p.camera.position = (0,2.0,1.0)
             p.camera.focal_point = (0,0,0.25)
 
 
 
-            p.show(screenshot='plots/%04d.png' % save)
+            p.show(screenshot='plots/b%04d.png' % save)
 
     def interpolate_field(self,pt):
         #Outputs the magnetic field vector at point pt, using the individual magnetic field vectors (no unecessary averaging)

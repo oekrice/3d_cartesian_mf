@@ -93,7 +93,7 @@ SUBROUTINE diagnostics(diag_num)
       print*, '______________________________________'
       !print*, 'Total current squared', t, diag_sumj(diag_num)
       print*, 'Time', diag_time(diag_num)
-      !print*, 'Open Flux', diag_oflux(diag_num)
+      print*, 'Open Flux', diag_oflux(diag_num)
       print*, 'Total Current', diag_sumj(diag_num)
       !print*, 'Average Current', diag_avgj(diag_num)
       !print*, 'Magnetic Energy', diag_energy(diag_num)
@@ -158,6 +158,7 @@ SUBROUTINE save_snap(snap_num)
     INTEGER:: xc_id, yc_id, zc_id
     INTEGER:: bx_id, by_id, bz_id
     INTEGER:: jx_id, jy_id, jz_id
+    INTEGER:: ex_id, ey_id, ez_id
 
     if (snap_num < 10) then
         write (output_filename, "(A27,A3,I1,A3)") trim(data_directory), "000", snap_num, ".nc"
@@ -188,6 +189,9 @@ SUBROUTINE save_snap(snap_num)
     call try(nf90_def_var(ncid, 'jy', nf90_double, (/xs_id ,yc_id, zs_id/), jy_id))
     call try(nf90_def_var(ncid, 'jz', nf90_double, (/xs_id ,ys_id, zc_id/), jz_id))
 
+    call try(nf90_def_var(ncid, 'ex', nf90_double, (/xc_id ,ys_id, zs_id/), ex_id))
+    call try(nf90_def_var(ncid, 'ey', nf90_double, (/xs_id ,yc_id, zs_id/), ey_id))
+    call try(nf90_def_var(ncid, 'ez', nf90_double, (/xs_id ,ys_id, zc_id/), ez_id))
 
     call try(nf90_enddef(ncid))
     call try(nf90_close(ncid))
@@ -225,6 +229,18 @@ SUBROUTINE save_snap(snap_num)
 
             call try(nf90_inq_varid(ncid, 'jz', vid))
             call try(nf90_put_var(ncid, vid, jz(0:nx,0:ny,1:nz), &
+            start = (/x_rank*nx+1,y_rank*ny+1,z_rank*nz+1/),count = (/nx+1,ny+1,nz/)))
+
+            call try(nf90_inq_varid(ncid, 'ex', vid))
+            call try(nf90_put_var(ncid, vid, ex(1:nx,0:ny,0:nz), &
+            start = (/x_rank*nx+1,y_rank*ny+1,z_rank*nz+1/),count = (/nx,ny+1,nz+1/)))
+
+            call try(nf90_inq_varid(ncid, 'ey', vid))
+            call try(nf90_put_var(ncid, vid, ey(0:nx,1:ny,0:nz), &
+            start = (/x_rank*nx+1,y_rank*ny+1,z_rank*nz+1/),count = (/nx+1,ny,nz+1/)))
+
+            call try(nf90_inq_varid(ncid, 'ez', vid))
+            call try(nf90_put_var(ncid, vid, ez(0:nx,0:ny,1:nz), &
             start = (/x_rank*nx+1,y_rank*ny+1,z_rank*nz+1/),count = (/nx+1,ny+1,nz/)))
 
             call try(nf90_close(ncid))
