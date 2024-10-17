@@ -19,8 +19,6 @@ SUBROUTINE timestep()
     !New timestep with a quasi-implicit bit. Using a predictor for the magnfield of the new bit but not the old
     CALL calculate_magnetic()
 
-    CALL magnetic_boundary()
-
     !CALL check_solenoidal()
     !CALL calculate_jp()
 
@@ -30,8 +28,6 @@ SUBROUTINE timestep()
     CALL b_to_gridpts()
 
     CALL calculate_velocity()
-
-    CALL add_boundary_flows()
 
     CALL calculate_electric()
 
@@ -49,13 +45,18 @@ SUBROUTINE calculate_magnetic()
 
     ! INTERIOR POINTS (DON'T USE INFORMATION FROM A THAT DOESN'T EXIST)
 
+
     bx(0:nx, 1:ny,1:nz) = (az(0:nx,1:ny,1:nz) - az(0:nx, 0:ny-1,1:nz))/dy - (ay(0:nx,1:ny,1:nz) - ay(0:nx,1:ny,0:nz-1))/dz
 
     by(1:nx, 0:ny,1:nz) = (ax(1:nx,0:ny,1:nz) - ax(1:nx, 0:ny,0:nz-1))/dz - (az(1:nx,0:ny,1:nz) - az(0:nx-1,0:ny,1:nz))/dx
 
     bz(1:nx, 1:ny,0:nz) = (ay(1:nx,1:ny,0:nz) - ay(0:nx-1, 1:ny,0:nz))/dx - (ax(1:nx,1:ny,0:nz) - ax(1:nx,0:ny-1,0:nz))/dy
 
+    CALL bfield_mpi
     CALL magnetic_boundary
+
+    if (n== 0) bz_surf_reference(0:nx+1,0:ny+1) = bz(0:nx+1,0:ny+1,0)  !Save reference lower boundary field to stop annoying instabilities due to lack of upwinding
+    !if (n > 0) bz(0:nx+1,0:ny+1,0) = bz_surf_reference(0:nx+1,0:ny+1)
 
 END SUBROUTINE calculate_magnetic
 
@@ -116,7 +117,8 @@ SUBROUTINE calculate_velocity
 END SUBROUTINE calculate_velocity
 
 SUBROUTINE add_boundary_flows()
-    !Test script to add some velocity to the lower boundary
+
+    !Adds twisting directly onto the electric field. Only affects ez (for the jet model, at least)
     IMPLICIT NONE
     real(num):: br, bl, kb    !Parameters for the boundary motions (taken from Pariat)
     real(num), dimension(:,:):: bzdy(0:nx+1,0:ny), bzdx(0:nx,0:ny+1)
@@ -141,7 +143,6 @@ SUBROUTINE add_boundary_flows()
       vx(0:nx,0:ny,0) = shearfact*vx_surf
       vy(0:nx,0:ny,0) = shearfact*vy_surf
 
-
     end if
 
 END SUBROUTINE add_boundary_flows
@@ -161,8 +162,6 @@ SUBROUTINE check_solenoidal()
 
 END SUBROUTINE check_solenoidal
 
-
-
 SUBROUTINE calculate_electric()
 
     !Calculates the electric field - resistivity, magnetofriction and boundary effects
@@ -177,22 +176,28 @@ SUBROUTINE calculate_electric()
         ez(0:nx, 0:ny,1:nz) = ez(0:nx, 0:ny,1:nz) + eta*jz(0:nx, 0:ny,1:nz)
     end if
 
+    !Add shearing (if necessary) directly onto this (averaged) field
+    CALL add_boundary_flows()
+
     ex1 = vz*by1 - vy*bz1
     ey1 = vx*bz1 - vz*bx1
     ez1 = vy*bx1 - vx*by1
 
+    !if (z_down < 0) then
+    !    ex1(0:nx,0:ny,0) = 0.0_num
+    !    ey1(0:nx,0:ny,0) = 0.0_num
+    !end if
     !Average to Ribs (interior only):
     ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz)  + 0.5_num*(ex1(0:nx-1,0:ny,0:nz) + ex1(1:nx,0:ny,0:nz))
     ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)  + 0.5_num*(ey1(0:nx,0:ny-1,0:nz) + ey1(0:nx,1:ny,0:nz))
     ez(0:nx,0:ny,1:nz) = ez(0:nx,0:ny,1:nz)  + 0.5_num*(ez1(0:nx,0:ny,0:nz-1) + ez1(0:nx,0:ny,1:nz))
-
-    !allocate(bx(-1:nx+1,0:ny+1,0:nz+1)); allocate(by(0:nx+1,-1:ny+1,0:nz+1)); allocate(bz(0:nx+1,0:ny+1,-1:nz+1))
 
     !Add outflow (if necessary) directly onto this field
     if (voutfact > 0) then
     ex(0:nx+1,-1:ny+1,0:nz+1) = ex(0:nx+1,-1:ny+1,0:nz+1) + voutx(0:nx+1,-1:ny+1,0:nz+1)*by(0:nx+1,-1:ny+1,0:nz+1)
     ey(-1:nx+1,0:ny+1,0:nz+1) = ey(-1:nx+1,0:ny+1,0:nz+1) - vouty(-1:nx+1,0:ny+1,0:nz+1)*bx(-1:nx+1,0:ny+1,0:nz+1)
     end if
+
 
 
 END SUBROUTINE calculate_electric

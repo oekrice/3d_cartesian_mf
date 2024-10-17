@@ -28,7 +28,6 @@ SUBROUTINE magnetic_boundary()
 
     !PROBLEM WITH CORNERS!
 
-    if (.false.) then
     !x boundaries (Zero current, and zero flux)
     if (x_rank == 0) then
       bx(-1,:,:) = -bx(1,:,:)
@@ -69,8 +68,6 @@ SUBROUTINE magnetic_boundary()
       bx(:,:,nz+1) = bx(:,:,nz  )
       by(:,:,nz+1) = by(:,:,nz  )
       bz(:,:,nz+1) = bz(:,:,nz-1)
-    end if
-
     end if
 
     !LOWER BOUNDARY (Zero current)
@@ -139,8 +136,6 @@ SUBROUTINE magnetic_boundary()
     if (y_rank == y_procs-1) then
     by(0:nx+1,ny+1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,ny,0:nz+1)*dx*dz + bx(-1:nx,ny+1,0:nz+1)*dy*dz - bx(0:nx+1,ny+1,0:nz+1)*dy*dz + bz(0:nx+1,ny+1,-1:nz)*dx*dy - bz(0:nx+1,ny+1,0:nz+1)*dx*dy)
     end if
-
-    if (n== 0) bz_surf_reference(0:nx+1,0:ny+1) = bz(0:nx+1,0:ny+1,0)  !Save reference lower boundary field to stop annoying instabilities due to lack of upwinding
 
 END SUBROUTINE magnetic_boundary
 
