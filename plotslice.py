@@ -83,7 +83,7 @@ if len(sys.argv) > 2:
 for plot_num in range(0,nsnaps,1):
 
     if remote_flag:
-        data_directory = './Data/'
+        data_directory = '/nobackup/trcn27/mf3d0/%03d/' % run
     else:
         data_directory = '/extra/tmp/trcn27/mf3d/%03d/' % run
 
