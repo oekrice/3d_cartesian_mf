@@ -199,7 +199,7 @@ if True:
 #RUN CODE
 #-------------------------------------
 
-if True:
+if hflag < 0.5:
     os.system('make')
     print('Using output directory "%s"' % (data_directory))
     if nprocs <= 4:
