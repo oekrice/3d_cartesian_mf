@@ -23,6 +23,15 @@ else:
 
 hflag = 0
 
+if not os.path.isdir('./inits'):
+    os.mkdir('./inits')
+
+if not os.path.isdir('./parameters'):
+    os.mkdir('./parameters')
+
+if not os.path.isdir('./diagnostics'):
+    os.mkdir('./diagnostics')
+
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
 voutfact = 0.2
