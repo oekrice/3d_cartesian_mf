@@ -169,6 +169,8 @@ class trace_fieldlines():
         while go:
             if not self.inbounds(pt):
                 go = False
+            elif len(pts) > 1000:  #some arbitrary limit...
+                go = False
             else:
                 grad = self.interpolate_field(pts[-1])
                 pt = pt + updown*self.ds*grad
