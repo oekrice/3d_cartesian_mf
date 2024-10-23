@@ -21,16 +21,12 @@ if len(sys.argv) > 2:
 else:
     nprocs = 1
 
-hflag = 0
+if os.uname()[1] == 'brillouin.dur.ac.uk':
+    hflag = 0
+else:
+    hflag = 1
 
-if not os.path.isdir('./inits'):
-    os.mkdir('./inits')
 
-if not os.path.isdir('./parameters'):
-    os.mkdir('./parameters')
-
-if not os.path.isdir('./diagnostics'):
-    os.mkdir('./diagnostics')
 
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
@@ -143,8 +139,22 @@ np.savetxt('parameters/variables%03d.txt' % run, variables)   #variables numbere
 #SOME FOLDER ADMIN
 #-------------------------------------
 
+if not hflag:
+    data_directory = '/extra/tmp/trcn27/mf3d/%03d/' % run
+else:
+    data_directory = '/nobackup/trcn27/mf3d0/%03d/' % run
 
-data_directory = '/extra/tmp/trcn27/mf3d/%03d/' % run
+if not os.path.isdir('./inits'):
+    os.mkdir('./inits')
+
+if not os.path.isdir('./parameters'):
+    os.mkdir('./parameters')
+
+if not os.path.isdir('./diagnostics'):
+    os.mkdir('./diagnostics')
+
+if not os.path.isdir(data_directory[:-3]):
+    os.mkdir(data_directory[:-3])
 
 if os.path.isdir(data_directory):
     for i in range(1000):
