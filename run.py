@@ -153,8 +153,8 @@ if not os.path.isdir('./parameters'):
 if not os.path.isdir('./diagnostics'):
     os.mkdir('./diagnostics')
 
-if not os.path.isdir(data_directory[:-3]):
-    os.mkdir(data_directory[:-3])
+if not os.path.isdir(data_directory[:-4]):
+    os.mkdir(data_directory[:-4])
 
 if os.path.isdir(data_directory):
     for i in range(1000):
