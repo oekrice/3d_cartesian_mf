@@ -252,6 +252,8 @@ SUBROUTINE calculate_timestep()
     print*, 'dt due to eta0',  cfl*min(dx,dy,dz)**2/eta0
     dt_ideal = cfl*dt_ideal
     print*, 'Ideal dt', dt_ideal
+
+    print*, 'diffusion factor', eta*dt_ideal/dx**2
     !Adjust so there are an integer number of timesteps in between plots
     plot_dt = tmax/(ndiags-1)
     nt = int(ndiags-1)*(int((plot_dt-1d-6)/dt_ideal)+1)

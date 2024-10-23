@@ -36,9 +36,9 @@ eta0 = 0.0
 
 tmax = 600.0
 
-nx = 96
-ny = 96
-nz = 96
+nx = 64
+ny = 64
+nz = 64
 
 nplots = 600
 ndiags = 600
@@ -63,7 +63,7 @@ def lbound_fn(x,y):
     d = 0.25; z0 = 0.5
     for i, xi in enumerate(x):
         for j,yj in enumerate(y):
-            lbound_fn[i,j] = z0/(((xi-d)**2 + yj**2 + z0**2)**1.5) - z0/(((xi+d)**2 + yj**2 + z0**2)**1.5)
+            lbound_fn[i,j] = z0/(((xi-d)**2 + yj**2 + z0**2)**1.5) - z0/(((xi+d)**2 + yj**2 + z0**2)**1.5) + 0.1*random.random()
 
     return lbound_fn
     #return random.rand(len(x))

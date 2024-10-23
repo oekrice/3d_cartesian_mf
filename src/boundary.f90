@@ -112,29 +112,35 @@ SUBROUTINE magnetic_boundary()
 
     !LOWER BOUNDARY
     if (z_rank == 0) then
-    bz(0:nx+1,0:ny+1,-1) = (1.0_num/(dx*dy))*(bz(0:nx+1,0:ny+1,0)*dx*dy - bx(-1:nx,0:ny+1,0)*dy*dz + bx(0:nx+1,0:ny+1,0)*dy*dz - by(0:nx+1,-1:ny,0)*dx*dz + by(0:nx+1,0:ny+1,0)*dx*dz)
+    bz(0:nx+1,0:ny+1,-1) = (1.0_num/(dx*dy))*(bz(0:nx+1,0:ny+1,0)*dx*dy - bx(-1:nx,0:ny+1,0)*dy*dz + &
+    bx(0:nx+1,0:ny+1,0)*dy*dz - by(0:nx+1,-1:ny,0)*dx*dz + by(0:nx+1,0:ny+1,0)*dx*dz)
     end if
     !UPPER BOUNDARY
     if (z_rank == z_procs - 1) then
-    bz(0:nx+1,0:ny+1,nz+1) = (1.0_num/(dx*dy))*(bz(0:nx+1,0:ny+1,nz)*dx*dy + bx(-1:nx,0:ny+1,nz+1)*dy*dz - bx(0:nx+1,0:ny+1,nz+1)*dy*dz + by(0:nx+1,-1:ny,nz+1)*dx*dz - by(0:nx+1,0:ny+1,nz+1)*dx*dz)
+    bz(0:nx+1,0:ny+1,nz+1) = (1.0_num/(dx*dy))*(bz(0:nx+1,0:ny+1,nz)*dx*dy + bx(-1:nx,0:ny+1,nz+1)*dy*dz - &
+    bx(0:nx+1,0:ny+1,nz+1)*dy*dz + by(0:nx+1,-1:ny,nz+1)*dx*dz - by(0:nx+1,0:ny+1,nz+1)*dx*dz)
     end if
 
     !x boundaries (Zero current, and zero flux)
     if (x_rank == 0) then
-    bx(-1,0:ny+1,0:nz+1) = (1.0_num/(dy*dz))*(bx(0,0:ny+1,0:nz+1)*dy*dz - by(0,-1:ny,0:nz+1)*dx*dz + by(0,0:ny+1,0:nz+1)*dx*dz - bz(0,0:ny+1,-1:nz)*dx*dy + bz(0,0:ny+1,0:nz+1)*dx*dy)
+    bx(-1,0:ny+1,0:nz+1) = (1.0_num/(dy*dz))*(bx(0,0:ny+1,0:nz+1)*dy*dz - by(0,-1:ny,0:nz+1)*dx*dz + &
+    by(0,0:ny+1,0:nz+1)*dx*dz - bz(0,0:ny+1,-1:nz)*dx*dy + bz(0,0:ny+1,0:nz+1)*dx*dy)
     end if
 
     if (x_rank == x_procs-1) then
-    bx(nx+1,0:ny+1,0:nz+1) = (1.0_num/(dy*dz))*(bx(nx,0:ny+1,0:nz+1)*dy*dz + by(nx+1,-1:ny,0:nz+1)*dx*dz - by(nx+1,0:ny+1,0:nz+1)*dx*dz + bz(nx+1,0:ny+1,-1:nz)*dx*dy - bz(nx+1,0:ny+1,0:nz+1)*dx*dy)
+    bx(nx+1,0:ny+1,0:nz+1) = (1.0_num/(dy*dz))*(bx(nx,0:ny+1,0:nz+1)*dy*dz + by(nx+1,-1:ny,0:nz+1)*dx*dz - &
+    by(nx+1,0:ny+1,0:nz+1)*dx*dz + bz(nx+1,0:ny+1,-1:nz)*dx*dy - bz(nx+1,0:ny+1,0:nz+1)*dx*dy)
     end if
 
     !y boundaries (Zero current, and zero flux)
     if (y_rank == 0) then
-    by(0:nx+1,-1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,0,0:nz+1)*dx*dz - bx(-1:nx,0,0:nz+1)*dy*dz + bx(0:nx+1,0,0:nz+1)*dy*dz - bz(0:nx+1,0,-1:nz)*dx*dy + bz(0:nx+1,0,0:nz+1)*dx*dy)
+    by(0:nx+1,-1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,0,0:nz+1)*dx*dz - bx(-1:nx,0,0:nz+1)*dy*dz + &
+    bx(0:nx+1,0,0:nz+1)*dy*dz - bz(0:nx+1,0,-1:nz)*dx*dy + bz(0:nx+1,0,0:nz+1)*dx*dy)
     end if
 
     if (y_rank == y_procs-1) then
-    by(0:nx+1,ny+1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,ny,0:nz+1)*dx*dz + bx(-1:nx,ny+1,0:nz+1)*dy*dz - bx(0:nx+1,ny+1,0:nz+1)*dy*dz + bz(0:nx+1,ny+1,-1:nz)*dx*dy - bz(0:nx+1,ny+1,0:nz+1)*dx*dy)
+    by(0:nx+1,ny+1,0:nz+1) = (1.0_num/(dx*dz))*(by(0:nx+1,ny,0:nz+1)*dx*dz + bx(-1:nx,ny+1,0:nz+1)*dy*dz - &
+    bx(0:nx+1,ny+1,0:nz+1)*dy*dz + bz(0:nx+1,ny+1,-1:nz)*dx*dy - bz(0:nx+1,ny+1,0:nz+1)*dx*dy)
     end if
 
 END SUBROUTINE magnetic_boundary
