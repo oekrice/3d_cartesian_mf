@@ -31,9 +31,9 @@ eta0 = 0.0
 
 tmax = 600.0
 
-nx = 64
-ny = 64
-nz = 64
+nx = 96
+ny = 96
+nz = 96
 
 nplots = 600
 ndiags = 600
