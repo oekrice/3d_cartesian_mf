@@ -247,7 +247,7 @@ SUBROUTINE calculate_timestep()
     if (eta > 0 ) dt_ideal = min(dt_ideal, min(dx,dy,dz)**2/eta)
     print*, 'dt due to eta', cfl*min(dx,dy,dz)**2/eta
     if (shearfact > 0 ) dt_ideal = min(dt_ideal, min(dy,dx)/shearfact)
-    print*, 'dt due to shearing', cfl*min(dy,dx)/shearfact
+    print*, 'dt due to shearing', cfl*min(dy,dx)/(shearfact*15.0)
     if (eta0 > 0) dt_ideal = min(dt_ideal, min(dx,dy,dz)**2/eta0)
     print*, 'dt due to eta0',  cfl*min(dx,dy,dz)**2/eta0
     dt_ideal = cfl*dt_ideal

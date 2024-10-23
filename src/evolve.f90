@@ -124,17 +124,18 @@ SUBROUTINE add_boundary_flows()
     real(num), dimension(:,:):: bzdy(0:nx+1,0:ny), bzdx(0:nx,0:ny+1)
     real(num), dimension(:,:):: bzdy0(0:nx,0:ny), bzdx0(0:nx,0:ny)
     real(num), dimension(:,:):: fact(0:nx+1,0:ny+1), fact0(0:nx,0:ny)
+    !real(num), dimension(:,:):: bzdy1(0:nx,0:ny), bzdx1(0:nx,0:ny)
 
     if (z_down < 0 .and. shearfact > 1d-6) then
     br = 13.0_num; bl = 0.1_num; kb = 15.0_num
 
-      bzdy = (bz_surf_reference(0:nx+1,1:ny+1) - bz_surf_reference(0:nx+1,0:ny)) / dy
-      bzdx = (bz_surf_reference(1:nx+1,0:ny+1) - bz_surf_reference(0:nx,0:ny+1)) / dx
+      bzdy = (bz(0:nx+1,1:ny+1,0) - bz(0:nx+1,0:ny,0)) / dy
+      bzdx = (bz(1:nx+1,0:ny+1,0) - bz(0:nx,0:ny+1,0)) / dx
 
       bzdy0 = 0.5_num*(bzdy(1:nx+1,0:ny) + bzdy(0:nx,0:ny))
       bzdx0 = 0.5_num*(bzdx(0:nx,1:ny+1) + bzdx(0:nx,0:ny))
 
-      fact = (kb*(br-bl))/(bz_surf_reference(0:nx+1,0:ny+1) + 1d-10)*tanh(kb*(bz_surf_reference(0:nx+1,0:ny+1)- bl)/(br-bl+1d-10))
+      fact = (kb*(br-bl))/(bz(0:nx+1,0:ny+1,0) + 1d-10)*tanh(kb*(bz(0:nx+1,0:ny+1,0)- bl)/(br-bl+1d-10))
       fact0 = 0.25_num*(fact(0:nx,0:ny) + fact(1:nx+1,0:ny) + fact(0:nx,1:ny+1) + fact(1:nx+1, 1:ny+1))
 
       vx_surf(0:nx, 0:ny) = -fact0*bzdy0
