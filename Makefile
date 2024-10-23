@@ -1,7 +1,7 @@
 # Set compiler, flags and netcdf library according to machine we are using:
 
 ifeq ($(shell hostname),hamilton8.dur.ac.uk)
-	MPIF90 ?= mpif90
+	MPIF90 ?= mpiifort
 	NETCDF = -I /usr/local/Cluster-Apps/netcdf-fortran/ompi/gcc/4.4.4/include
 	NETCDFLIB = -L/usr/local/Cluster-Apps/netcdf-fortran/ompi/gcc/4.4.4/lib  -lnetcdff
 	FFLAGS = -O3 -fcheck=all -Wuninitialized -march=native -fimplicit-none -Wall -Wextra -ffast-math -funroll-loops --param max-unroll-times=5
