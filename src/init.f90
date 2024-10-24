@@ -200,6 +200,13 @@ SUBROUTINE establish_grid()
 
     call try(nf90_close(ncid))
 
+    !if (x_down == -1 .and. y_down == -1 .and. z_down == -1) then
+    !    az(2,2,2) = 1.0_num
+    !end if
+
+    !az(2,2,2) = 1.0_num
+
+
     xs(-1) = 2*xs(0) - xs(1); xs(nx+1) = 2*xs(nx) - xs(nx-1)
     ys(-1) = 2*ys(0) - ys(1); ys(ny+1) = 2*ys(ny) - ys(ny-1)
     zs(-1) = 2*zs(0) - zs(1); zs(nz+1) = 2*zs(nz) - zs(nz-1)
@@ -282,7 +289,7 @@ SUBROUTINE set_outflow()
     allocate(vouty(-1:nx+1,0:ny+1,-1:nz+1))  !Outflow combining with ey
 
     do k = -1, nz+1
-        hfact = (zs(k) - zs(0))/(zs(nz) - zs(0))   !Distance up the domain
+        hfact = (zs(k) - z0_global)/(z1_global - z0_global)   !Distance up the domain.
         do i = 0, nx+1
             do j = -1, ny+1
                 voutx(i,j,k) = voutfact*hfact**2

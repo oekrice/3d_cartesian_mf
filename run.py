@@ -30,21 +30,21 @@ else:
 
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
-voutfact = 0.2
-shearfact = 5e-4
+voutfact = 1.0
+shearfact = 0.05
 eta0 = 0.0
 
-tmax = 600.0
+tmax = 0.1
 
 nx = 64
 ny = 64
 nz = 64
 
-nplots = 600
-ndiags = 600
+nplots = 11
+ndiags = 11
 
-nu0 = 0.5
-eta = 1e-3*nu0
+nu0 = 1.0
+eta = 0.0
 
 x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0

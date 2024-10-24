@@ -27,18 +27,18 @@ MODULE mpi_tools
             if (mod(proc_divide, 2) .ne. 0) then
                 exit
             else
-                if (dcount == 0) x_procs = x_procs*2
+                if (dcount == 2) x_procs = x_procs*2
                 if (dcount == 1) y_procs = y_procs*2
-                if (dcount == 2) z_procs = z_procs*2
+                if (dcount == 0) z_procs = z_procs*2
                 proc_divide = proc_divide/2
                 dcount = mod(dcount + 1, 3)
             end if
         end do
+
         if (nprocs .ne. x_procs*y_procs*z_procs) then
             print*, 'MPI Decomposition failed'
             CALL MPI_abort(comm, ierr)
         end if
-
 
         z_rank = (z_procs*proc_num)/nprocs
         y_rank = mod(proc_num, x_procs*y_procs)/x_procs

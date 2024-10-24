@@ -55,7 +55,7 @@ SUBROUTINE calculate_magnetic()
     CALL bfield_mpi
     CALL magnetic_boundary
 
-    if (n== 0) bz_surf_reference(0:nx+1,0:ny+1) = bz(0:nx+1,0:ny+1,0)  !Save reference lower boundary field to stop annoying instabilities due to lack of upwinding
+    if (n == 0) bz_surf_reference(0:nx+1,0:ny+1) = bz(0:nx+1,0:ny+1,0)  !Save reference lower boundary field to stop annoying instabilities due to lack of upwinding
     !if (n > 0) bz(0:nx+1,0:ny+1,0) = bz_surf_reference(0:nx+1,0:ny+1)
 
 END SUBROUTINE calculate_magnetic
