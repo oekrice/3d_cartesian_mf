@@ -282,7 +282,7 @@ SUBROUTINE set_outflow()
     allocate(vouty(-1:nx+1,0:ny+1,-1:nz+1))  !Outflow combining with ey
 
     do k = -1, nz+1
-        hfact = (zs(k) - zs(0))/(zs(nz) - zs(0))   !Distance up the domain
+        hfact = (zs(k) - z0_global)/(z1_global - z0_global)   !Distance up the domain.
         do i = 0, nx+1
             do j = -1, ny+1
                 voutx(i,j,k) = voutfact*hfact**2
