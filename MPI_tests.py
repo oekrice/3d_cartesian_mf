@@ -69,65 +69,71 @@ i = 0
 if len(sys.argv) > 2:
     i = int(sys.argv[2])
 
-for run in range(4):
-#for plot_num in range(0,nsnaps,1):
-    plot_num = 9
-    if remote_flag:
-        data_directory = '/nobackup/trcn27/mf3d0/%03d/' % run
-    else:
-        data_directory = '/extra/tmp/trcn27/mf3d/%03d/' % run
+for plot_num in range(0,nsnaps,1):
+    for run in range(2):
+        #plot_num = 9
+        if remote_flag:
+            data_directory = '/nobackup/trcn27/mf3d0/%03d/' % run
+        else:
+            data_directory = '/extra/tmp/trcn27/mf3d/%03d/' % run
 
-    slice_index = ny//2
-    i = plot_num
-    wait = 0
-    fname = '%s%04d.nc' % (data_directory, i)
-    print('Looking at file', i, 'fname', fname)
+        slice_index = ny//2
+        i = plot_num
+        wait = 0
+        fname = '%s%04d.nc' % (data_directory, i)
+        print('Looking at file', i, 'fname', fname)
 
-    try:
-        data = netcdf_file(fname, 'r', mmap=False)
-        print('File', fname, 'found')
+        try:
+            data = netcdf_file(fname, 'r', mmap=False)
+            print('File', fname, 'found')
 
-    except:
-        print('File', fname, 'not found')
-        continue
+        except:
+            print('File', fname, 'not found')
+            continue
 
-    bx = np.zeros((nx+1,ny+2,nz+2))
-    by = np.zeros((nx+2,ny+1,nz+2))
-    bz = np.zeros((nx+2,ny+2,nz+1))
+        bx = np.zeros((nx+1,ny+2,nz+2))
+        by = np.zeros((nx+2,ny+1,nz+2))
+        bz = np.zeros((nx+2,ny+2,nz+1))
 
-    bx[:,1:-1,1:-1] = np.swapaxes(data.variables['bx'][:],0,2)
-    by[1:-1,:,1:-1] = np.swapaxes(data.variables['by'][:],0,2)
-    bz[1:-1,1:-1,:] = np.swapaxes(data.variables['bz'][:],0,2)
+        bx[:,1:-1,1:-1] = np.swapaxes(data.variables['bx'][:],0,2)
+        by[1:-1,:,1:-1] = np.swapaxes(data.variables['by'][:],0,2)
+        bz[1:-1,1:-1,:] = np.swapaxes(data.variables['bz'][:],0,2)
 
 
-    jx = np.zeros((nx+2,ny+1,nz+1))
-    jy = np.zeros((nx+1,ny+2,nz+1))
-    jz = np.zeros((nx+1,ny+1,nz+2))
+        jx = np.zeros((nx+2,ny+1,nz+1))
+        jy = np.zeros((nx+1,ny+2,nz+1))
+        jz = np.zeros((nx+1,ny+1,nz+2))
 
-    jx[1:-1,:,:] = np.swapaxes(data.variables['jx'][:],0,2)
-    jy[:,1:-1,:] = np.swapaxes(data.variables['jy'][:],0,2)
-    jz[:,:,1:-1] = np.swapaxes(data.variables['jz'][:],0,2)
+        jx[1:-1,:,:] = np.swapaxes(data.variables['jx'][:],0,2)
+        jy[:,1:-1,:] = np.swapaxes(data.variables['jy'][:],0,2)
+        jz[:,:,1:-1] = np.swapaxes(data.variables['jz'][:],0,2)
 
-    ex = np.zeros((nx+2,ny+1,nz+1))
-    ey = np.zeros((nx+1,ny+2,nz+1))
-    ez = np.zeros((nx+1,ny+1,nz+2))
+        ex = np.zeros((nx+2,ny+1,nz+1))
+        ey = np.zeros((nx+1,ny+2,nz+1))
+        ez = np.zeros((nx+1,ny+1,nz+2))
 
-    ex[1:-1,:,:] = np.swapaxes(data.variables['ex'][:],0,2)
-    ey[:,1:-1,:] = np.swapaxes(data.variables['ey'][:],0,2)
-    ez[:,:,1:-1] = np.swapaxes(data.variables['ez'][:],0,2)
+        ex[1:-1,:,:] = np.swapaxes(data.variables['ex'][:],0,2)
+        ey[:,1:-1,:] = np.swapaxes(data.variables['ey'][:],0,2)
+        ez[:,:,1:-1] = np.swapaxes(data.variables['ez'][:],0,2)
 
-    data.close()
+        data.close()
 
-    if run == 0:
-        ex_reference = ex[1:-1,:,:]
-        ey_reference = ex[:,1:-1,:]
-        ez_reference = ex[:,:,1:-1]
+        if run == 0:
+            ex_reference = ex[1:-1,:,:]
+            ey_reference = ey[:,1:-1,:]
+            ez_reference = ez[:,:,1:-1]
 
-    else:
-        print('Test number', run)
-        print('ex', np.allclose(ex_reference, ex[1:-1,:,:]))
-        print('ey', np.allclose(ex_reference, ex[1:-1,:,:]))
-        print('ez', np.allclose(ex_reference, ex[1:-1,:,:]))
+            bx_reference = bx[:,1:-1,1:-1]
+            by_reference = by[1:-1,:,1:-1]
+            bz_reference = bz[1:-1,1:-1,:]
+        else:
+            print('Test number', run)
+            print('ex', np.allclose(ex_reference, ex[1:-1,:,:]))
+            print('ey', np.allclose(ey_reference, ey[:,1:-1,:]))
+            print('ez', np.allclose(ez_reference, ez[:,:,1:-1]))
+            print('bx', np.allclose(bx_reference, bx[:,1:-1,1:-1]))
+            print('by', np.allclose(by_reference, by[1:-1,:,1:-1]))
+            print('bz', np.allclose(bz_reference, bz[1:-1,1:-1,:]))
 
 
 

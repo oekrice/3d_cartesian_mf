@@ -45,7 +45,6 @@ SUBROUTINE calculate_magnetic()
 
     ! INTERIOR POINTS (DON'T USE INFORMATION FROM A THAT DOESN'T EXIST)
 
-
     bx(0:nx, 1:ny,1:nz) = (az(0:nx,1:ny,1:nz) - az(0:nx, 0:ny-1,1:nz))/dy - (ay(0:nx,1:ny,1:nz) - ay(0:nx,1:ny,0:nz-1))/dz
 
     by(1:nx, 0:ny,1:nz) = (ax(1:nx,0:ny,1:nz) - ax(1:nx, 0:ny,0:nz-1))/dz - (az(1:nx,0:ny,1:nz) - az(0:nx-1,0:ny,1:nz))/dx
@@ -194,8 +193,8 @@ SUBROUTINE calculate_electric()
 
     !Add outflow (if necessary) directly onto this field
     if (voutfact > 0) then
-    ex(0:nx+1,-1:ny+1,0:nz+1) = ex(0:nx+1,-1:ny+1,0:nz+1) + voutx(0:nx+1,-1:ny+1,0:nz+1)*by(0:nx+1,-1:ny+1,0:nz+1)
-    ey(-1:nx+1,0:ny+1,0:nz+1) = ey(-1:nx+1,0:ny+1,0:nz+1) - vouty(-1:nx+1,0:ny+1,0:nz+1)*bx(-1:nx+1,0:ny+1,0:nz+1)
+    ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz) + by(1:nx,0:ny,0:nz)!voutx(1:nx,0:ny,0:nz)!*by(0:nx+1,-1:ny+1,0:nz+1)
+    ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)! - vouty(-1:nx+1,0:ny+1,0:nz)!*bx(-1:nx+1,0:ny+1,0:nz+1)
     end if
 
 

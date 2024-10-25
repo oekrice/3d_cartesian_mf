@@ -31,10 +31,10 @@ else:
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
 voutfact = 1.0
-shearfact = 0.05
+shearfact = 0.0
 eta0 = 0.0
 
-tmax = 0.1
+tmax = 1.25e-2
 
 nx = 64
 ny = 64
@@ -44,7 +44,7 @@ nplots = 11
 ndiags = 11
 
 nu0 = 1.0
-eta = 0.0
+eta = 1.0
 
 x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0
@@ -63,7 +63,7 @@ def lbound_fn(x,y):
     d = 0.25; z0 = 0.5
     for i, xi in enumerate(x):
         for j,yj in enumerate(y):
-            lbound_fn[i,j] = z0/(((xi-d)**2 + yj**2 + z0**2)**1.5) - z0/(((xi+d)**2 + yj**2 + z0**2)**1.5) + 0.1*random.random()
+            lbound_fn[i,j] = z0/(((xi-d)**2 + yj**2 + z0**2)**1.5) - z0/(((xi+d)**2 + yj**2 + z0**2)**1.5)
 
     return lbound_fn
     #return random.rand(len(x))
@@ -76,7 +76,7 @@ def lbound_pariat(x,y):
     dipole_mag = 25.0; zstar = z1*1.5/24.0
     for i, xi in enumerate(x):
         for j,yj in enumerate(y):
-            lbound_fn[i,j] = sf**3*dipole_mag*(2*(zstar)**2 - ((xi)**2 + (yj)**2))/(((xi)**2 + (yj)**2 + (zstar)**2)**2.5)
+            lbound_fn[i,j] = sf**3*dipole_mag*(2*(zstar)**2 - ((xi)**2 + (yj)**2))/(((xi)**2 + (yj)**2 + (zstar)**2)**2.5) + 10.0*random.random()
 
     print('Max lbound', np.max(lbound_fn))
     print('Lbound flux', np.sum(np.abs(lbound_fn)))
@@ -180,7 +180,7 @@ class Grid():
         self.ys = np.linspace(self.y0,self.y1,self.ny+1)
         self.zs = np.linspace(self.z0,self.z1,self.nz+1)
 
-if True:
+if False:
     grid= Grid()
     init = compute_initial_condition(grid, lbound_pariat, run, background_strength = 1.0, boundary_error_limit = 1e-6, init_filename = './inits/init%03d.nc' % run)
 
