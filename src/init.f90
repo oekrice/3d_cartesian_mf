@@ -18,15 +18,15 @@ SUBROUTINE initialise()
 
     CALL read_parameters()
 
-    CALL allocate_arrays()
+    !CALL allocate_arrays()
 
-    CALL establish_grid()
+    !CALL establish_grid()
 
-    CALL calculate_timestep()
+    !CALL calculate_timestep()
 
-    CALL set_outflow()
+    !CALL set_outflow()
 
-    CALL set_shearing()
+    !CALL set_shearing()
 
     !CALL pressure_function()
 

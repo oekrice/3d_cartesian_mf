@@ -18,6 +18,7 @@ PROGRAM main
     ! Import the parameters and set up the grid
     CALL initialise()
 
+    if (.false.) then
     if (hamilton_flag < 0.5) then
         data_directory_root = '/extra/tmp/trcn27/mf3d/'
     else
@@ -35,7 +36,7 @@ PROGRAM main
     print*, 'DATA DIRECTORY:  ', data_directory
 
     if (proc_num == 0) print*, 'Initial condition set up in Fortran. Running...'
-    do n = 0, -1!nt-1  ! Actually run the code
+    do n = 0, nt-1  ! Actually run the code
 
         CALL timestep()  !Does everything except the actual timestep (for diagnostic reasons)
 
@@ -61,7 +62,6 @@ PROGRAM main
 
     end do
 
-
     if (proc_num == 0) then
         print*, 'Open Flux', proc_num, z_rank, sum(abs(bz(1:nx,1:ny,nz)))
         print*, 'Max. currents', proc_num, sum(abs(jx(2:nx-2,2:ny-2,2:nz-1))), &
@@ -72,7 +72,10 @@ PROGRAM main
 
     !CALL save_snap(int(nplots-1.0))
     !CALL diagnostics(ndiags-1)
+    end if
+
     CALL mpi_finalize(ierr)
+    STOP
     if (proc_num == 0) print*, 'Fortran code completed sucessfully. Carry on.'
 
 END PROGRAM main
