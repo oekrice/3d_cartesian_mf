@@ -194,9 +194,9 @@ class compute_initial_condition():
                     self.ay[i,j,k] = self.ay[i,j,k-1] - self.dz*self.bx[i,j+1,k]
 
         #Add random fluctuations
-        self.ax = self.ax
-        self.ay = self.ay
-        self.az = self.az
+        self.ax = self.ax + 0.0*np.random.random(size = np.shape(self.ax))
+        self.ay = self.ay + 0.0*np.random.random(size = np.shape(self.ay))
+        self.az = self.az + 0.0*np.random.random(size = np.shape(self.az))
 
         bx_test = np.zeros((self.nx+1,self.ny+2,self.nz+2))
         by_test = np.zeros((self.nx+2,self.ny+1,self.nz+2))

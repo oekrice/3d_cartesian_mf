@@ -104,164 +104,131 @@ MODULE mpi_tools
         integer:: j,k
 
         !MPI routines for passing the boundary data
-        if (.true.) then
         !Send z data DOWN
         if (z_down >= 0) then
-            do j = -1 ,ny+1
-                call mpi_send(by(0:nx+1,j,1), nx+2, MPI_DOUBLE_PRECISION, z_down, j+1, comm, ierr)
-            end do
-
-            do j = 0 ,ny+1
-                call mpi_send(bx(-1:nx+1,j,1), nx+3, MPI_DOUBLE_PRECISION, z_down, j + nx*ny + 1, comm, ierr)
-            end do
-        end if
-        !Send z data UP
-        if (z_up >= 0) then
-            do j = -1 ,ny+1
-                call mpi_send(by(0:nx+1,j,nz), nx+2, MPI_DOUBLE_PRECISION, z_up, j + 1, comm, ierr)
-            end do
-            do j = 0 ,ny+1
-                call mpi_send(bx(-1:nx+1,j,nz), nx+3, MPI_DOUBLE_PRECISION, z_up, j + nx*ny + 1, comm, ierr)
-            end do
+            call mpi_send(by(0,-1,1), 1, by_zface, z_down, 0, comm, ierr)
+            call mpi_send(bx(-1,0,1), 1, bx_zface, z_down, 1, comm, ierr)
         end if
 
-        call MPI_BARRIER(comm, ierr)
         !Receive z data from ABOVE
         if (z_up >= 0) then
-            do j = -1 ,ny+1
-                call mpi_recv(by(0:nx+1,j,nz+1), nx+2, MPI_DOUBLE_PRECISION, z_up, j + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
-            do j = 0 ,ny+1
-                call mpi_recv(bx(-1:nx+1,j,nz+1), nx+3, MPI_DOUBLE_PRECISION, z_up, j + nx*ny + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
+            call mpi_recv(by(0,-1,nz+1), 1, by_zface, z_up, 0, comm, MPI_STATUS_IGNORE, ierr)
+            call mpi_recv(bx(-1,0,nz+1), 1, bx_zface, z_up, 1, comm, MPI_STATUS_IGNORE, ierr)
         end if
-        !Receive z data from BELOW
+
+        !Send z data UP
+        if (z_up >= 0) then
+            call mpi_send(by(0,-1,nz), 1, by_zface, z_up, 0, comm, ierr)
+            call mpi_send(bx(-1,0,nz), 1, bx_zface, z_up, 1, comm, ierr)
+        end if
+
+        !Receive x data from BELOW
         if (z_down >= 0) then
-            do j = -1 ,ny+1
-                call mpi_recv(by(0:nx+1,j,0), nx+2, MPI_DOUBLE_PRECISION, z_down, j + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
-            do j = 0 ,ny+1
-                call mpi_recv(bx(-1:nx+1,j,0), nx+3 , MPI_DOUBLE_PRECISION, z_down, j + nx*ny + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
+            call mpi_recv(by(0,-1,0), 1, by_zface, z_down, 0, comm, MPI_STATUS_IGNORE, ierr)
+            call mpi_recv(bx(-1,0,0), 1, bx_zface, z_down, 1, comm, MPI_STATUS_IGNORE, ierr)
         end if
 
-        call MPI_BARRIER(comm, ierr)
-        end if
-
-
-        if (.true.) then
-        !Send x data DOWN
         if (x_down >= 0) then
-            do j = 0, ny+1
-            do k = -1 ,nz+1
-                call mpi_send(bz(1,j,k), 1, MPI_DOUBLE_PRECISION, x_down, k+2*ny*(j+1) + 1, comm, ierr)
-            end do
-            end do
-            do j = -1, ny+1
-            do k = 0 ,nz+1
-                call mpi_send(by(1,j,k), 1, MPI_DOUBLE_PRECISION, x_down, k+2*ny*(j+1) + ny*nz + 1, comm, ierr)
-            end do
-            end do
+            call mpi_send(by(1,-1,0), 1, by_xface, x_down, 0, comm, ierr)
+            call mpi_send(bz(1,0,-1), 1, bz_xface, x_down, 1, comm, ierr)
+        end if
+
+        !Receive x data from ABOVE
+        if (x_up >= 0) then
+            call mpi_recv(by(nx+1,-1,0), 1, by_xface, x_up, 0, comm, MPI_STATUS_IGNORE, ierr)
+            call mpi_recv(bz(nx+1,0,-1), 1, bz_xface, x_up, 1, comm, MPI_STATUS_IGNORE, ierr)
         end if
 
         !Send x data UP
-
         if (x_up >= 0) then
-            do j = 0, ny+1
-            do k = -1 ,nz+1
-                call mpi_send(bz(nx,j,k), 1, MPI_DOUBLE_PRECISION, x_up, k+2*ny*(j+1) + 1, comm, ierr)
-            end do
-            end do
-            do j = -1, ny+1
-            do k = 0 ,nz+1
-                call mpi_send(by(nx,j,k), 1, MPI_DOUBLE_PRECISION, x_up,  k+2*ny*(j+1) + ny*nz + 1, comm, ierr)
-            end do
-            end do
+            call mpi_send(by(nx,-1,0), 1, by_xface, x_up, 0, comm, ierr)
+            call mpi_send(bz(nx,0,-1), 1, bz_xface, x_up, 1, comm, ierr)
         end if
 
-
-        call MPI_BARRIER(comm, ierr)
-
-        !Receive x from above
-        if (x_up >= 0) then
-            do j = 0, ny+1
-            do k = -1 ,nz+1
-                call mpi_recv(bz(nx+1,j,k), 1, MPI_DOUBLE_PRECISION, x_up, k+2*ny*(j+1) + 1, comm, MPI_STATUS_IGNORE,ierr)
-            end do
-            end do
-            do j = -1, ny+1
-            do k = 0 ,nz+1
-                call mpi_recv(by(nx+1,j,k), 1, MPI_DOUBLE_PRECISION, x_up,  k+2*ny*(j+1) + ny*nz + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
-            end do
-        end if
-
-        !Receive x from below
-
+        !Receive x data from BELOW
         if (x_down >= 0) then
-            do j = 0, ny+1
-            do k = -1 ,nz+1
-                call mpi_recv(bz(0,j,k), 1, MPI_DOUBLE_PRECISION, x_down, k+2*ny*(j+1) + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
-            end do
-            do j = -1, ny+1
-            do k = 0 ,nz+1
-                call mpi_recv(by(0,j,k), 1, MPI_DOUBLE_PRECISION, x_down, k+2*ny*(j+1) + ny*nz + 1, comm, MPI_STATUS_IGNORE, ierr)
-            end do
-            end do
+            call mpi_recv(by(0,-1,0), 1, by_xface, x_down, 0, comm, MPI_STATUS_IGNORE, ierr)
+            call mpi_recv(bz(0,0,-1), 1, bz_xface, x_down, 1, comm, MPI_STATUS_IGNORE, ierr)
         end if
 
-        call MPI_BARRIER(comm, ierr)
-
-        end if
-
-        if (.true.) then
-        !Send y data DOWN
         if (y_down >= 0) then
-            do k = -1 ,nz+1
-                call mpi_send(bz(0:nx+1,1,k), nx+2, MPI_DOUBLE_PRECISION, y_down, k + 1, comm, ierr)
-            end do
-            do k = 0 ,nz+1
-                call mpi_send(bx(-1:nx+1,1,k), nx+3, MPI_DOUBLE_PRECISION, y_down, k + nx*nz + 1, comm, ierr)
-            end do
+            call mpi_send(bx(-1,1,0), 1, bx_yface, y_down, 0, comm, ierr)
+            call mpi_send(bz(0,1,-1), 1, bz_yface, y_down, 1, comm, ierr)
+        end if
+
+        !Receive y data from ABOVE
+        if (y_up >= 0) then
+            call mpi_recv(bx(-1,ny+1,0), 1, bx_yface, y_up, 0, comm, MPI_STATUS_IGNORE, ierr)
+            call mpi_recv(bz(0,ny+1,-1), 1, bz_yface, y_up, 1, comm, MPI_STATUS_IGNORE, ierr)
         end if
 
         !Send y data UP
         if (y_up >= 0) then
-            do k = -1 ,nz+1
-                call mpi_send(bz(0:nx+1,ny,k), nx+2, MPI_DOUBLE_PRECISION, y_up, k + 1, comm, ierr)
-            end do
-            do k = 0 ,nz+1
-                call mpi_send(bx(-1:nx+1,ny,k), nx+3, MPI_DOUBLE_PRECISION, y_up, k + nx*nz + 1, comm, ierr)
-            end do
+            call mpi_send(bx(-1,ny,0), 1, bx_yface, y_up, 0, comm, ierr)
+            call mpi_send(bz(0,ny,-1), 1, bz_yface, y_up, 1, comm, ierr)
         end if
 
-        call MPI_BARRIER(comm, ierr)
-
-        !Receive y from above
-        if (y_up >= 0) then
-            do k = -1 ,nz+1
-                call mpi_recv(bz(0:nx+1,ny+1,k), nx+2, MPI_DOUBLE_PRECISION, y_up, k + 1, comm, MPI_STATUS_IGNORE,ierr)
-            end do
-            do k = 0 ,nz+1
-                call mpi_recv(bx(-1:nx+1,ny+1,k), nx+3, MPI_DOUBLE_PRECISION, y_up, k + nx*nz + 1, comm,MPI_STATUS_IGNORE, ierr)
-            end do
-        end if
-
-        !Receive y from below
+        !Receive y data from BELOW
         if (y_down >= 0) then
-            do k = -1 ,nz+1
-                call mpi_recv(bz(0:nx+1,0,k), nx+2, MPI_DOUBLE_PRECISION, y_down, k + 1, comm, MPI_STATUS_IGNORE,ierr)
-            end do
-            do k = 0 ,nz+1
-                call mpi_recv(bx(-1:nx+1,0,k), nx+3, MPI_DOUBLE_PRECISION, y_down, k + nx*nz + 1, comm,MPI_STATUS_IGNORE, ierr)
-            end do
+            call mpi_recv(bx(-1,0,0), 1, bx_yface, y_down, 0, comm, MPI_STATUS_IGNORE, ierr)
+            call mpi_recv(bz(0,0,-1), 1, bz_yface, y_down, 1, comm, MPI_STATUS_IGNORE, ierr)
         end if
+
 
         call MPI_BARRIER(comm, ierr)
 
-        end if
         return
     END SUBROUTINE bfield_mpi
 
+    SUBROUTINE mpi_create_types
+        !There appears to be a (fairly low) integer limit on the MPI, so I'll try to get around this by doing the types properly.
+        !Should hopefully only need to do six of these.
+        IMPLICIT NONE
+        INTEGER:: mpitype
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+2,ny+3,nz+2/), (/nx+2,ny+3,1/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        by_zface = mpitype
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+3,ny+2,nz+2/), (/nx+3,ny+2,1/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        bx_zface = mpitype
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+3,ny+2,nz+2/), (/nx+3,1,nz+2/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        bx_yface = mpitype
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+2,ny+2,nz+3/), (/nx+2,1,nz+3/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        bz_yface = mpitype
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+2,ny+3,nz+2/), (/1,ny+3,nz+2/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        by_xface = mpitype
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+2,ny+2,nz+3/), (/1,ny+2,nz+3/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        bz_xface = mpitype
+
+    END SUBROUTINE mpi_create_types
+
 END MODULE mpi_tools
+

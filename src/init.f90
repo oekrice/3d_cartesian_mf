@@ -18,6 +18,21 @@ SUBROUTINE initialise()
 
     CALL read_parameters()
 
+    CALL start_mpi()
+
+    CALL MPI_BARRIER(comm, ierr)
+    if (proc_num == -1) then
+        print*, 'Run Number', int(run_number)
+        print*, 'Outflow', voutfact
+        print*, 'Shearing', shearfact
+        print*, 'eta', eta
+        print*, 'nu0', nu0
+        print*, 'eta0', eta0
+        print*, 'Data directory', data_directory
+    end if
+
+    CALL MPI_create_types
+
     CALL allocate_arrays()
 
     CALL establish_grid()
@@ -82,18 +97,6 @@ SUBROUTINE read_parameters()
 
     hamilton_flag = int(variables(23))
 
-    CALL start_mpi()
-
-    CALL MPI_BARRIER(comm, ierr)
-    if (proc_num == -1) then
-        print*, 'Run Number', int(run_number)
-        print*, 'Outflow', voutfact
-        print*, 'Shearing', shearfact
-        print*, 'eta', eta
-        print*, 'nu0', nu0
-        print*, 'eta0', eta0
-        print*, 'Data directory', data_directory
-    end if
 
 END SUBROUTINE read_parameters
 

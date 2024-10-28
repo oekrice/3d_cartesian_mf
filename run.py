@@ -27,11 +27,10 @@ else:
     hflag = 1
 
 
-
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
 voutfact = 0.2
-shearfact = 5e-4
+shearfact = 3.7e-5
 eta0 = 0.0
 
 tmax = 600.0
@@ -43,7 +42,7 @@ nz = 64
 nplots = 600
 ndiags = 600
 
-nu0 = 1.0
+nu0 = 0.1
 eta = 1e-3*nu0
 
 x0 = -12.0; x1 = 12.0

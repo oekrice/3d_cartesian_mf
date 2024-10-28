@@ -84,12 +84,14 @@ MODULE shared_data
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_avglorentz
 
     !MPI
-    INTEGER:: comm, ierr, MPI_loc(3)
+    INTEGER:: comm, ierr, MPI_loc(3), mpitag = 1
     INTEGER:: nprocs, proc_num
     INTEGER:: x_procs, y_procs, z_procs
     INTEGER:: x_rank, y_rank, z_rank
     INTEGER:: x_up, y_up, z_up, x_down, y_down, z_down
-    INTEGER:: mpi_tag = 1
+    INTEGER :: bx_xface, by_xface, bz_xface, bx_xface1
+    INTEGER :: bx_yface, by_yface, bz_yface, by_yface1
+    INTEGER :: bx_zface, by_zface, bz_zface, bz_zface1
 
     !Extras
     REAL(num), DIMENSION(:,:), ALLOCATABLE:: bz_surf_reference
