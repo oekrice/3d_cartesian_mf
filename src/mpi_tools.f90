@@ -12,56 +12,87 @@ MODULE mpi_tools
     SUBROUTINE start_mpi()
 
         IMPLICIT NONE
-        integer:: proc_divide, dcount
+        integer:: i
+        INTEGER:: mpi_dims(3), mpi_dims_best(3)
+        LOGICAL:: mpi_periodic(3)
+        REAL(num):: diff_best, diff, mean
+
         ! - Have already established the global rank.
         call mpi_init(ierr)  !Tells it to start using MPI
 
         call mpi_comm_size(MPI_COMM_WORLD, nprocs, ierr) !Number of processes globally.
         call mpi_comm_rank(MPI_COMM_WORLD, proc_num, ierr) !Returns the rank of current process
 
-        ! - Establish grid decomposition into processes, which should be powers of 2
-        proc_divide = nprocs
-        x_procs = 1; y_procs = 1; z_procs = 1
-        dcount = maxloc((/nx_global,ny_global,nz_global/),dim=1) - 1
-        do while (.true.)
-            if (mod(proc_divide, 2) .ne. 0) then
-                exit
-            else
-                if (dcount == 0) x_procs = x_procs*2
-                if (dcount == 1) y_procs = y_procs*2
-                if (dcount == 2) z_procs = z_procs*2
-                proc_divide = proc_divide/2
-                dcount = mod(dcount + 1, 3)
-            end if
-        end do
-        if (nprocs .ne. x_procs*y_procs*z_procs) then
-            print*, 'MPI Decomposition failed'
-            CALL MPI_abort(comm, ierr)
+        ! Choose optimum division of procs that fits grid dimensions:
+        ! This algorithm only appears to work for 4 or more processors, so will need some exceptions
+        if (nprocs == 1) then
+            mpi_dims_best = (/1,1,1/)
+
+        else if (nprocs == 2) then
+            mpi_dims_best = (/1,1,2/)
+        else
+        diff_best = REAL(nprocs)
+        mpi_dims_best = (/-1,-1,-1/)
+        DO i = 2, nprocs, 2
+            IF (MOD(nprocs, i) == 0) THEN
+                mpi_dims = (/0, 0, i/)
+                ! Find optimum decomposition with i points in p:
+                CALL MPI_DIMS_CREATE(nprocs, 3, mpi_dims, ierr)
+                ! Check whether this is allowed:
+                nx = nx_global / mpi_dims(1)
+                ny = ny_global / mpi_dims(2)
+                nz = nz_global / mpi_dims(3)
+                IF (((nx * mpi_dims(1)) == nx_global) &
+                    .AND. ((ny * mpi_dims(2) == ny_global)) &
+                    .AND. ((nz * mpi_dims(3)) == nz_global)) THEN
+                    mean = SUM(REAL(mpi_dims))/3.0_d
+                    diff = MAXVAL(REAL(mpi_dims) - mean)
+                    IF (diff < diff_best) THEN
+                        diff_best = diff
+                        mpi_dims_best = mpi_dims
+                    END IF
+                END IF
+            END IF
+        END DO
         end if
+        IF (mpi_dims_best(1) * mpi_dims_best(2) * mpi_dims_best(3) == nprocs) THEN
+            mpi_dims = mpi_dims_best
+            nx = nx_global / mpi_dims(1)
+            ny = ny_global / mpi_dims(2)
+            nz = nz_global / mpi_dims(3)
+        ELSE
+            PRINT*,'ERROR: THIS NUMBER OF MPI PROCS DOES NOT FIT THE GRID'
+            CALL MPI_abort(comm, ierr)
+        END IF
 
+        x_procs = mpi_dims(1); y_procs = mpi_dims(2); z_procs = mpi_dims(3);
+        MPI_periodic = (/.false.,.false.,.false./)
+        !Attempt to use the DUMFRIC way of establishing the communicator:
+        CALL MPI_CART_CREATE(MPI_COMM_WORLD, 3, MPI_dims, MPI_periodic, .TRUE., &
+        comm, ierr)
 
-        z_rank = (z_procs*proc_num)/nprocs
-        y_rank = mod(proc_num, x_procs*y_procs)/x_procs
-        x_rank = mod(mod(proc_num, x_procs*y_procs), x_procs)
+        !Redistribute ranks based on this new communicator
+        CALL MPI_COMM_RANK(comm, proc_num, ierr)
 
-        nx = nx_global/x_procs; ny = ny_global/y_procs; nz = nz_global/z_procs
-        t = 0.0
+        CALL MPI_CART_COORDS(comm, proc_num, 3, mpi_loc, ierr)
+        CALL MPI_CART_SHIFT(comm, 0, 1, x_down, x_up, ierr)
+        CALL MPI_CART_SHIFT(comm, 1, 1, y_down, y_up, ierr)
+        CALL MPI_CART_SHIFT(comm, 2, 1, z_down, z_up, ierr)
 
-        x_up = -1; x_down = -1
-        y_up = -1; y_down = -1
-        z_up = -1; z_down = -1
+        x_rank = mpi_loc(1); y_rank = mpi_loc(2); z_rank = mpi_loc(3)
 
-        if (x_rank < x_procs-1) x_up = proc_num + 1
-        if (x_rank > 0)      x_down = proc_num - 1
+        call MPI_BARRIER(comm, ierr)
 
-
-        if (y_rank < y_procs-1) y_up = proc_num + x_procs
-        if (y_rank > 0) y_down = proc_num - x_procs
-
-        if (z_rank < z_procs-1) z_up = proc_num + (x_procs*y_procs)
-        if (z_rank > 0) z_down = proc_num - (x_procs*y_procs)
-
-        !print*, proc_num, y_rank, y_procs, y_up, y_down
+        do i = 0, nprocs-1
+            if (proc_num == i .and. .false.) then
+                print*, proc_num, x_rank, y_rank, z_rank
+                print*, 'x', x_down, x_up
+                print*, 'y', y_down, y_up
+                print*, 'z', z_down, z_up
+                print*, '______________________________'
+            end if
+            call MPI_BARRIER(comm, ierr)
+        end do
 
         return
     END SUBROUTINE start_mpi
@@ -234,24 +265,3 @@ MODULE mpi_tools
     END SUBROUTINE bfield_mpi
 
 END MODULE mpi_tools
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

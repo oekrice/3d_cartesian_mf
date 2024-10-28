@@ -84,7 +84,7 @@ MODULE shared_data
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_avglorentz
 
     !MPI
-    INTEGER:: comm, ierr
+    INTEGER:: comm, ierr, MPI_loc(3)
     INTEGER:: nprocs, proc_num
     INTEGER:: x_procs, y_procs, z_procs
     INTEGER:: x_rank, y_rank, z_rank

@@ -26,7 +26,7 @@ SUBROUTINE initialise()
 
     CALL set_outflow()
 
-    !CALL set_shearing()
+    CALL set_shearing()
 
     !CALL pressure_function()
 
@@ -85,7 +85,7 @@ SUBROUTINE read_parameters()
     CALL start_mpi()
 
     CALL MPI_BARRIER(comm, ierr)
-    if (proc_num == 0) then
+    if (proc_num == -1) then
         print*, 'Run Number', int(run_number)
         print*, 'Outflow', voutfact
         print*, 'Shearing', shearfact
@@ -165,11 +165,11 @@ SUBROUTINE establish_grid()
     INTEGER:: ncid, vid
 
     if (run_number < 10) then
-      write (init_filename, "(A12, A2, I1, A3)") './inits/init', '00', int(run_number), '.nc'
+      write (init_filename, "(A12, A2, I1, A3)") './inits/init', '00', 0, '.nc'
     else if (run_number < 100) then
-      write (init_filename, "(A12, A1, I2, A3)") './inits/init', '0', int(run_number), '.nc'
+      write (init_filename, "(A12, A1, I2, A3)") './inits/init', '0', 0, '.nc'
     else
-      write (init_filename, "(A12, I3, A3)") './inits/init', int(run_number), '.nc'
+      write (init_filename, "(A12, I3, A3)") './inits/init', 0, '.nc'
     end if
 
     call try(nf90_open(trim(init_filename), nf90_nowrite, ncid))
@@ -199,6 +199,13 @@ SUBROUTINE establish_grid()
     start = (/z_rank*nz+1/),count = (/nz+1/)))
 
     call try(nf90_close(ncid))
+
+    !if (x_down == -1 .and. y_down == -1 .and. z_down == -1) then
+    !    az(2,2,2) = 1.0_num
+    !end if
+
+    !az(2,2,2) = 1.0_num
+
 
     xs(-1) = 2*xs(0) - xs(1); xs(nx+1) = 2*xs(nx) - xs(nx-1)
     ys(-1) = 2*ys(0) - ys(1); ys(ny+1) = 2*ys(ny) - ys(ny-1)
@@ -241,15 +248,15 @@ SUBROUTINE calculate_timestep()
 
     if (proc_num == 0) then
     if (nu0 > 0) dt_ideal = (min(dx,dy,dz))**2/(nu0*(1.0))
-    print*, 'dt due to nu0', cfl*(min(dx,dy,dz))**2/(nu0*(1.0))
+    if (nu0 > 0) print*, 'dt due to nu0', cfl*(min(dx,dy,dz))**2/(nu0*(1.0))
     if (voutfact > 0) dt_ideal = min(dt_ideal, dz/voutfact)
-    print*, 'dt due to outflow',  cfl*dz/voutfact
+    if (voutfact > 0) print*, 'dt due to outflow',  cfl*dz/voutfact
     if (eta > 0 ) dt_ideal = min(dt_ideal, min(dx,dy,dz)**2/eta)
-    print*, 'dt due to eta', cfl*min(dx,dy,dz)**2/eta
+    if (eta > 0 ) print*, 'dt due to eta', cfl*min(dx,dy,dz)**2/eta
     if (shearfact > 0 ) dt_ideal = min(dt_ideal, min(dy,dx)/shearfact)
-    print*, 'dt due to shearing', cfl*min(dy,dx)/(shearfact*15.0)
+    if (shearfact > 0 ) print*, 'dt due to shearing', cfl*min(dy,dx)/(shearfact*15.0)
     if (eta0 > 0) dt_ideal = min(dt_ideal, min(dx,dy,dz)**2/eta0)
-    print*, 'dt due to eta0',  cfl*min(dx,dy,dz)**2/eta0
+    if (eta0 > 0) print*, 'dt due to eta0',  cfl*min(dx,dy,dz)**2/eta0
     dt_ideal = cfl*dt_ideal
     print*, 'Ideal dt', dt_ideal
 
@@ -300,10 +307,10 @@ END SUBROUTINE set_outflow
 SUBROUTINE set_shearing()
     ! Set the 1D array for the shearing velocity on the lower boundary. Is added to ex so is aligned with the x grid centres
     INTEGER:: i
-    allocate(vz0(-1:nx+2))
+    allocate(vz0(-1:nx+1))
 
-    do i = -1, nx+2
-        vz0(i) = shearfact*sin(xc(i)*PI/x1)
+    do i = -1, nx+1
+        vz0(i) = shearfact*sin(xs(i)*PI/x1_global)
     end do
 
 END SUBROUTINE set_shearing

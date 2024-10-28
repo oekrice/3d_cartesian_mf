@@ -18,6 +18,7 @@ PROGRAM main
     ! Import the parameters and set up the grid
     CALL initialise()
 
+    if (.true.) then
     if (hamilton_flag < 0.5) then
         data_directory_root = '/extra/tmp/trcn27/mf3d/'
     else
@@ -32,8 +33,6 @@ PROGRAM main
         write (data_directory, "(A23,I3,A1)") data_directory_root, int(run_number), "/"
     end if
 
-    print*, 'DATA DIRECTORY:  ', data_directory
-
     if (proc_num == 0) print*, 'Initial condition set up in Fortran. Running...'
     do n = 0, nt-1  ! Actually run the code
 
@@ -41,12 +40,11 @@ PROGRAM main
 
         if (MOD(n, (nt/int(nplots-1))) == 0) then   ! Save a snapshot (prints a message as well)
             CALL save_snap(int(n/(nt/int(nplots-1))))
-            !if (proc_num == 0) print*, 'Snapshot ', int(n/(nt/int(nplots-1))), 'saved at time', t
-
+            if (proc_num == 0) print*, 'Snapshot ', int(n/(nt/int(nplots-1))), 'saved at time', t
         end if
 
         if (MOD(n, (nt/int(ndiags-1))) == 0) then   ! Save a snapshot (prints a message as well)
-            CALL diagnostics(int(n/(nt/(ndiags-1))))
+        !    CALL diagnostics(int(n/(nt/(ndiags-1))))
             !if (proc_num == 0) print*, 'Step', n, 'at time', t
 
             !print*, 'Max all currents', maxval(abs(jx(0:nx+1, 0:ny,0:nz))), maxval(abs(jy(0:nx, 0:ny+1,0:nz))), maxval(abs(jz(0:nx, 0:ny,0:nz+1)))
@@ -61,18 +59,19 @@ PROGRAM main
 
     end do
 
-
     if (proc_num == 0) then
         print*, 'Open Flux', proc_num, z_rank, sum(abs(bz(1:nx,1:ny,nz)))
         print*, 'Max. currents', proc_num, sum(abs(jx(2:nx-2,2:ny-2,2:nz-1))), &
         sum(abs(jy(2:nx-2,2:ny-2,2:nz-1))), sum(abs(jz(2:nx-2,2:ny-2,2:nz-1)))
     end if
-    CALL diagnostics(int(n/(nt/(ndiags-1))))
+    !CALL diagnostics(int(n/(nt/(ndiags-1))))
     if (proc_num == 0) print*, 'Step', n, 'at time', t
 
-    !CALL save_snap(int(nplots-1.0))
+    CALL save_snap(int(nplots-1.0))
     !CALL diagnostics(ndiags-1)
-    CALL mpi_finalize(ierr)
+    end if
     if (proc_num == 0) print*, 'Fortran code completed sucessfully. Carry on.'
+    CALL mpi_finalize(ierr)
+    STOP
 
 END PROGRAM main
