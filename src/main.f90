@@ -44,7 +44,7 @@ PROGRAM main
         end if
 
         if (MOD(n, (nt/int(ndiags-1))) == 0) then   ! Save a snapshot (prints a message as well)
-        !    CALL diagnostics(int(n/(nt/(ndiags-1))))
+            CALL diagnostics(int(n/(nt/(ndiags-1))))
             !if (proc_num == 0) print*, 'Step', n, 'at time', t
 
             !print*, 'Max all currents', maxval(abs(jx(0:nx+1, 0:ny,0:nz))), maxval(abs(jy(0:nx, 0:ny+1,0:nz))), maxval(abs(jz(0:nx, 0:ny,0:nz+1)))
