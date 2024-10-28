@@ -29,7 +29,7 @@ SUBROUTINE timestep()
 
     CALL calculate_velocity()
 
-    CALL calculate_electric()
+    !CALL calculate_electric()
 
     CALL MPI_Barrier(comm,ierr)  !Wait for t to be broadcast everywhere.
 
@@ -95,14 +95,14 @@ END SUBROUTINE b_to_gridpts
 SUBROUTINE calculate_velocity
     !Calculates the magnetofrictional velocity
     IMPLICIT NONE
-    b2 = bx1**2 + by1**2 + bz1**2 !B squared
+    b2 = bx1**2 + by1**2 + bz1**2 + 1e-6!B squared
 
     nu(:,:,:) = nu0
 
     if (abs(mf_delta) < 1e-10) then !No softening
         soft = b2
     else !Softening.
-        soft = (b2 + mf_delta*exp(-b2/mf_delta))
+        soft = b2 + mf_delta*exp(-b2/mf_delta))
     end if
 
     vx = nu*(jy1*bz1 - jz1*by1)/soft
