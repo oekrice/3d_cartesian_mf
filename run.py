@@ -43,7 +43,7 @@ nz = 64
 nplots = 600
 ndiags = 600
 
-nu0 = 0.5
+nu0 = 1.0
 eta = 1e-3*nu0
 
 x0 = -12.0; x1 = 12.0

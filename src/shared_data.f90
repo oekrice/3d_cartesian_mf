@@ -89,6 +89,7 @@ MODULE shared_data
     INTEGER:: x_procs, y_procs, z_procs
     INTEGER:: x_rank, y_rank, z_rank
     INTEGER:: x_up, y_up, z_up, x_down, y_down, z_down
+    INTEGER:: mpi_tag = 1
 
     !Extras
     REAL(num), DIMENSION(:,:), ALLOCATABLE:: bz_surf_reference

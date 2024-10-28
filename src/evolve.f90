@@ -181,10 +181,6 @@ SUBROUTINE calculate_electric()
     ey1 = vx*bz1 - vz*bx1
     ez1 = vy*bx1 - vx*by1
 
-    if (z_down < 0) then
-        ex1(0:nx,0:ny,0) = 0.0_num
-        ey1(0:nx,0:ny,0) = 0.0_num
-    end if
     !Average to Ribs (interior only):
     ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz)  + 0.5_num*(ex1(0:nx-1,0:ny,0:nz) + ex1(1:nx,0:ny,0:nz))
     ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)  + 0.5_num*(ey1(0:nx,0:ny-1,0:nz) + ey1(0:nx,1:ny,0:nz))
