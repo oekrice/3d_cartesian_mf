@@ -24,8 +24,15 @@ MODULE mpi_tools
         call mpi_comm_rank(MPI_COMM_WORLD, proc_num, ierr) !Returns the rank of current process
 
         ! Choose optimum division of procs that fits grid dimensions:
+        ! This algorithm only appears to work for 4 or more processors, so will need some exceptions
+        if (nprocs == 1) then
+            mpi_dims_best = (/1,1,1/)
+
+        else if (nprocs == 2) then
+            mpi_dims_best = (/1,1,2/)
+        else
         diff_best = REAL(nprocs)
-        mpi_dims_best = (/1,1,1/)
+        mpi_dims_best = (/-1,-1,-1/)
         DO i = 2, nprocs, 2
             IF (MOD(nprocs, i) == 0) THEN
                 mpi_dims = (/0, 0, i/)
@@ -47,6 +54,7 @@ MODULE mpi_tools
                 END IF
             END IF
         END DO
+        end if
         IF (mpi_dims_best(1) * mpi_dims_best(2) * mpi_dims_best(3) == nprocs) THEN
             mpi_dims = mpi_dims_best
             nx = nx_global / mpi_dims(1)
