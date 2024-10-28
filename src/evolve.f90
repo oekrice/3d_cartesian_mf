@@ -102,7 +102,7 @@ SUBROUTINE calculate_velocity
     if (abs(mf_delta) < 1e-10) then !No softening
         soft = b2
     else !Softening.
-        soft = b2 + mf_delta*exp(-b2/mf_delta))
+        soft = b2 + mf_delta*exp(-b2/mf_delta)
     end if
 
     vx = nu*(jy1*bz1 - jz1*by1)/soft
