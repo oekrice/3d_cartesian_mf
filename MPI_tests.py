@@ -69,7 +69,7 @@ i = 0
 if len(sys.argv) > 2:
     i = int(sys.argv[2])
 
-for plot_num in range(0,nsnaps,1):
+for plot_num in range(9,10):
     for run in range(2):
         #plot_num = 9
         if remote_flag:

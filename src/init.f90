@@ -307,10 +307,10 @@ END SUBROUTINE set_outflow
 SUBROUTINE set_shearing()
     ! Set the 1D array for the shearing velocity on the lower boundary. Is added to ex so is aligned with the x grid centres
     INTEGER:: i
-    allocate(vz0(-1:nx+2))
+    allocate(vz0(-1:nx+1))
 
-    do i = -1, nx+2
-        vz0(i) = shearfact*sin(xc(i)*PI/x1)
+    do i = -1, nx+1
+        vz0(i) = shearfact*sin(xs(i)*PI/x1_global)
     end do
 
 END SUBROUTINE set_shearing

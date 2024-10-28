@@ -30,7 +30,7 @@ else:
 
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
-voutfact = 1.0
+voutfact = 0.0
 shearfact = 0.0
 eta0 = 0.0
 
