@@ -70,7 +70,7 @@ if len(sys.argv) > 2:
     i = int(sys.argv[2])
 
 for plot_num in range(9,10):
-    for run in range(2):
+    for run in range(4):
         #plot_num = 9
         if remote_flag:
             data_directory = '/nobackup/trcn27/mf3d0/%03d/' % run
@@ -126,15 +126,21 @@ for plot_num in range(9,10):
             bx_reference = bx[:,1:-1,1:-1]
             by_reference = by[1:-1,:,1:-1]
             bz_reference = bz[1:-1,1:-1,:]
+
+            jx_reference = jx[1:-1,:,:]
+            jy_reference = jy[:,1:-1,:]
+            jz_reference = jz[:,:,1:-1]
+
         else:
             print('Test number', run)
-            print('ex', np.allclose(ex_reference, ex[1:-1,:,:]))
-            print('ey', np.allclose(ey_reference, ey[:,1:-1,:]))
-            print('ez', np.allclose(ez_reference, ez[:,:,1:-1]))
             print('bx', np.allclose(bx_reference, bx[:,1:-1,1:-1]))
             print('by', np.allclose(by_reference, by[1:-1,:,1:-1]))
             print('bz', np.allclose(bz_reference, bz[1:-1,1:-1,:]))
-
-
+            print('jx', np.allclose(jx_reference, jx[1:-1,:,:]))
+            print('jy', np.allclose(jy_reference, jy[:,1:-1,:]))
+            print('jz', np.allclose(jz_reference, jz[:,:,1:-1]))
+            print('ex', np.allclose(ex_reference, ex[1:-1,:,:]))
+            print('ey', np.allclose(ey_reference, ey[:,1:-1,:]))
+            print('ez', np.allclose(ez_reference, ez[:,:,1:-1]))
 
 

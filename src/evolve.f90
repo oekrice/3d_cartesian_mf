@@ -29,7 +29,7 @@ SUBROUTINE timestep()
 
     CALL calculate_velocity()
 
-    !CALL calculate_electric()
+    CALL calculate_electric()
 
     CALL MPI_Barrier(comm,ierr)  !Wait for t to be broadcast everywhere.
 
@@ -170,8 +170,8 @@ SUBROUTINE calculate_electric()
 
     if (eta > 0) then
         !Determine the current from the magnetic field (after boundary conditions etc.)
-        ex(1:nx, 0:ny,1:nz) = ex(1:nx, 0:ny,1:nz) + eta*jx(1:nx, 0:ny,1:nz)
-        ey(0:nx, 1:ny,1:nz) = ey(0:nx, 1:ny,1:nz) + eta*jy(0:nx, 1:ny,1:nz)
+        ex(1:nx, 0:ny,0:nz) = ex(1:nx, 0:ny,0:nz) + eta*jx(1:nx, 0:ny,0:nz)
+        ey(0:nx, 1:ny,0:nz) = ey(0:nx, 1:ny,0:nz) + eta*jy(0:nx, 1:ny,0:nz)
         ez(0:nx, 0:ny,1:nz) = ez(0:nx, 0:ny,1:nz) + eta*jz(0:nx, 0:ny,1:nz)
     end if
 
@@ -182,10 +182,10 @@ SUBROUTINE calculate_electric()
     ey1 = vx*bz1 - vz*bx1
     ez1 = vy*bx1 - vx*by1
 
-    !if (z_down < 0) then
-    !    ex1(0:nx,0:ny,0) = 0.0_num
-    !    ey1(0:nx,0:ny,0) = 0.0_num
-    !end if
+    if (z_down < 0) then
+        ex1(0:nx,0:ny,0) = 0.0_num
+        ey1(0:nx,0:ny,0) = 0.0_num
+    end if
     !Average to Ribs (interior only):
     ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz)  + 0.5_num*(ex1(0:nx-1,0:ny,0:nz) + ex1(1:nx,0:ny,0:nz))
     ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)  + 0.5_num*(ey1(0:nx,0:ny-1,0:nz) + ey1(0:nx,1:ny,0:nz))
@@ -193,8 +193,8 @@ SUBROUTINE calculate_electric()
 
     !Add outflow (if necessary) directly onto this field
     if (voutfact > 0) then
-    ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz) + by(1:nx,0:ny,0:nz)!voutx(1:nx,0:ny,0:nz)!*by(0:nx+1,-1:ny+1,0:nz+1)
-    ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz)! - vouty(-1:nx+1,0:ny+1,0:nz)!*bx(-1:nx+1,0:ny+1,0:nz+1)
+    ex(1:nx,0:ny,0:nz) = ex(1:nx,0:ny,0:nz) + voutx(1:nx,0:ny,0:nz)*by(1:nx,0:ny,0:nz)
+    ey(0:nx,1:ny,0:nz) = ey(0:nx,1:ny,0:nz) - vouty(0:nx,1:ny,0:nz)*bx(0:nx,1:ny,0:nz)
     end if
 
 

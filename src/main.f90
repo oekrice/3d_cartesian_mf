@@ -33,7 +33,7 @@ PROGRAM main
         write (data_directory, "(A23,I3,A1)") data_directory_root, int(run_number), "/"
     end if
 
-    print*, 'DATA DIRECTORY:  ', data_directory
+    if (proc_num == 0) print*, 'DATA DIRECTORY:  ', data_directory
 
     if (proc_num == 0) print*, 'Initial condition set up in Fortran. Running...'
     do n = 0, nt-1  ! Actually run the code
@@ -43,16 +43,15 @@ PROGRAM main
         if (MOD(n, (nt/int(nplots-1))) == 0) then   ! Save a snapshot (prints a message as well)
             CALL save_snap(int(n/(nt/int(nplots-1))))
             if (proc_num == 0) print*, 'Snapshot ', int(n/(nt/int(nplots-1))), 'saved at time', t
-
         end if
 
-        !if (MOD(n, (nt/int(ndiags-1))) == 0) then   ! Save a snapshot (prints a message as well)
+        if (MOD(n, (nt/int(ndiags-1))) == 0) then   ! Save a snapshot (prints a message as well)
         !    CALL diagnostics(int(n/(nt/(ndiags-1))))
             !if (proc_num == 0) print*, 'Step', n, 'at time', t
 
-            !print*, 'Max all currents', maxval(abs(jx(0:nx+1, 0:ny,0:nz))), maxval(abs(jy(0:nx, 0:ny+1,0:nz))), maxval(abs(jz(0:nx, 0:ny,0:nz+1)))
+            print*, 'Max all currents', maxval(abs(jx(0:nx+1, 0:ny,0:nz))), maxval(abs(jy(0:nx, 0:ny+1,0:nz))), maxval(abs(jz(0:nx, 0:ny,0:nz+1)))
 
-        !end if
+        end if
 
         ax = ax - dt*ex
         ay = ay - dt*ey
