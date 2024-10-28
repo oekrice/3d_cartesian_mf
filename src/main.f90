@@ -73,9 +73,8 @@ PROGRAM main
     !CALL save_snap(int(nplots-1.0))
     !CALL diagnostics(ndiags-1)
     end if
-
+    if (proc_num == 0) print*, 'Fortran code completed sucessfully. Carry on.'
     CALL mpi_finalize(ierr)
     STOP
-    if (proc_num == 0) print*, 'Fortran code completed sucessfully. Carry on.'
 
 END PROGRAM main
