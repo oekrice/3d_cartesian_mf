@@ -35,7 +35,7 @@ PROGRAM main
     print*, 'DATA DIRECTORY:  ', data_directory
 
     if (proc_num == 0) print*, 'Initial condition set up in Fortran. Running...'
-    do n = 0, nt-1  ! Actually run the code
+    do n = 0, -1!nt-1  ! Actually run the code
 
         CALL timestep()  !Does everything except the actual timestep (for diagnostic reasons)
 

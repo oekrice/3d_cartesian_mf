@@ -85,7 +85,7 @@ SUBROUTINE read_parameters()
     CALL start_mpi()
 
     CALL MPI_BARRIER(comm, ierr)
-    if (proc_num == 0) then
+    if (proc_num == -1) then
         print*, 'Run Number', int(run_number)
         print*, 'Outflow', voutfact
         print*, 'Shearing', shearfact
