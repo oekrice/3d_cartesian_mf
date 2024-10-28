@@ -18,15 +18,15 @@ SUBROUTINE initialise()
 
     CALL read_parameters()
 
-    !CALL allocate_arrays()
+    CALL allocate_arrays()
 
-    !CALL establish_grid()
+    CALL establish_grid()
 
-    !CALL calculate_timestep()
+    CALL calculate_timestep()
 
-    !CALL set_outflow()
+    CALL set_outflow()
 
-    !CALL set_shearing()
+    CALL set_shearing()
 
     !CALL pressure_function()
 
@@ -248,15 +248,15 @@ SUBROUTINE calculate_timestep()
 
     if (proc_num == 0) then
     if (nu0 > 0) dt_ideal = (min(dx,dy,dz))**2/(nu0*(1.0))
-    print*, 'dt due to nu0', cfl*(min(dx,dy,dz))**2/(nu0*(1.0))
+    if (nu0 > 0) print*, 'dt due to nu0', cfl*(min(dx,dy,dz))**2/(nu0*(1.0))
     if (voutfact > 0) dt_ideal = min(dt_ideal, dz/voutfact)
-    print*, 'dt due to outflow',  cfl*dz/voutfact
+    if (voutfact > 0) print*, 'dt due to outflow',  cfl*dz/voutfact
     if (eta > 0 ) dt_ideal = min(dt_ideal, min(dx,dy,dz)**2/eta)
-    print*, 'dt due to eta', cfl*min(dx,dy,dz)**2/eta
+    if (eta > 0 ) print*, 'dt due to eta', cfl*min(dx,dy,dz)**2/eta
     if (shearfact > 0 ) dt_ideal = min(dt_ideal, min(dy,dx)/shearfact)
-    print*, 'dt due to shearing', cfl*min(dy,dx)/(shearfact*15.0)
+    if (shearfact > 0 ) print*, 'dt due to shearing', cfl*min(dy,dx)/(shearfact*15.0)
     if (eta0 > 0) dt_ideal = min(dt_ideal, min(dx,dy,dz)**2/eta0)
-    print*, 'dt due to eta0',  cfl*min(dx,dy,dz)**2/eta0
+    if (eta0 > 0) print*, 'dt due to eta0',  cfl*min(dx,dy,dz)**2/eta0
     dt_ideal = cfl*dt_ideal
     print*, 'Ideal dt', dt_ideal
 

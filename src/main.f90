@@ -46,13 +46,13 @@ PROGRAM main
 
         end if
 
-        if (MOD(n, (nt/int(ndiags-1))) == 0) then   ! Save a snapshot (prints a message as well)
-            CALL diagnostics(int(n/(nt/(ndiags-1))))
+        !if (MOD(n, (nt/int(ndiags-1))) == 0) then   ! Save a snapshot (prints a message as well)
+        !    CALL diagnostics(int(n/(nt/(ndiags-1))))
             !if (proc_num == 0) print*, 'Step', n, 'at time', t
 
             !print*, 'Max all currents', maxval(abs(jx(0:nx+1, 0:ny,0:nz))), maxval(abs(jy(0:nx, 0:ny+1,0:nz))), maxval(abs(jz(0:nx, 0:ny,0:nz+1)))
 
-        end if
+        !end if
 
         ax = ax - dt*ex
         ay = ay - dt*ey
@@ -67,7 +67,7 @@ PROGRAM main
         print*, 'Max. currents', proc_num, sum(abs(jx(2:nx-2,2:ny-2,2:nz-1))), &
         sum(abs(jy(2:nx-2,2:ny-2,2:nz-1))), sum(abs(jz(2:nx-2,2:ny-2,2:nz-1)))
     end if
-    CALL diagnostics(int(n/(nt/(ndiags-1))))
+    !CALL diagnostics(int(n/(nt/(ndiags-1))))
     if (proc_num == 0) print*, 'Step', n, 'at time', t
 
     !CALL save_snap(int(nplots-1.0))

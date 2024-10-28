@@ -76,7 +76,7 @@ MODULE mpi_tools
         call MPI_BARRIER(comm, ierr)
 
         do i = 0, nprocs-1
-            if (proc_num == i) then
+            if (proc_num == i .and. .false.) then
                 print*, proc_num, x_rank, y_rank, z_rank
                 print*, 'x', x_down, x_up
                 print*, 'y', y_down, y_up
