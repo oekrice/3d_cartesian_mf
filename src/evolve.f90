@@ -55,7 +55,6 @@ SUBROUTINE calculate_magnetic()
     CALL magnetic_boundary
 
     if (n == 0) bz_surf_reference(0:nx+1,0:ny+1) = bz(0:nx+1,0:ny+1,0)  !Save reference lower boundary field to stop annoying instabilities due to lack of upwinding
-    !if (n > 0) bz(0:nx+1,0:ny+1,0) = bz_surf_reference(0:nx+1,0:ny+1)
 
 END SUBROUTINE calculate_magnetic
 
@@ -95,7 +94,7 @@ END SUBROUTINE b_to_gridpts
 SUBROUTINE calculate_velocity
     !Calculates the magnetofrictional velocity
     IMPLICIT NONE
-    b2 = bx1**2 + by1**2 + bz1**2 + 1e-6!B squared
+    b2 = bx1**2 + by1**2 + bz1**2!B squared
 
     nu(:,:,:) = nu0
 
