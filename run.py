@@ -29,8 +29,8 @@ else:
 
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
-voutfact = 2.0
-shearfact = 8e-5
+voutfact = 0.2
+shearfact = 3.7e-5
 eta0 = 0.0
 
 tmax = 600.0
@@ -133,7 +133,6 @@ variables[21] = zstar
 
 variables[22] = hflag
 
-np.savetxt('parameters/variables%03d.txt' % run, variables)   #variables numbered based on run number (up to 1000)
 
 #SOME FOLDER ADMIN
 #-------------------------------------
@@ -162,6 +161,7 @@ if os.path.isdir(data_directory):
 else:
     os.mkdir(data_directory)
 
+np.savetxt('parameters/variables%03d.txt' % run, variables)   #variables numbered based on run number (up to 1000)
 
 #Create initial condition using new init.py (potential field with arbitrary lower boundary and domain dimensions)
 #-------------------------------------

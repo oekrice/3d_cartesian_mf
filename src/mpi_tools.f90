@@ -101,8 +101,6 @@ MODULE mpi_tools
 
         IMPLICIT NONE
 
-        integer:: j,k
-
         !MPI routines for passing the boundary data
         !Send z data DOWN
         if (z_down >= 0) then
