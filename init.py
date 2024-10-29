@@ -115,6 +115,8 @@ class compute_initial_condition():
         self.bx[:,-1,:] = self.bx[:,-2,:] + self.dy*(self.by[1:,-1,:] - self.by[:-1,-1,:])/self.dx
 
         self.bz[:,:,:] = self.bz[:,:,:] - background_strength
+        self.bx[:,:,:] = self.bx[:,:,:] - 0.17*background_strength
+
         print('')
         print('Potential Field Calculated')
 
