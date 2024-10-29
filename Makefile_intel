@@ -55,14 +55,14 @@ endif
 	$(FC) -c $(FFLAGS) $(NETCDF) -o $(OBJDIR)/$@ $(PREPROFLAGS) $<
 
 $(FULLTARGET): $(OBJFILES)
-        @mkdir -p $(BINDIR)
-        $(FC) -o $@ $(addprefix $(OBJDIR)/,$(OBJFILES)) $(LDFLAGS) $(NETCDFLIB)
+	@mkdir -p $(BINDIR)
+	$(FC) -o $@ $(addprefix $(OBJDIR)/,$(OBJFILES)) $(LDFLAGS) $(NETCDFLIB)
 
 $(SDFMOD):
 	$(MAKE) -C $(SDF)
 
 clean:
-      	@rm -rf $(BINDIR) $(OBJDIR)
+	@rm -rf $(BINDIR) $(OBJDIR)
 
 
 $(OBJFILES): | $(OBJDIR)
