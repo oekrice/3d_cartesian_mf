@@ -137,24 +137,6 @@ SUBROUTINE allocate_arrays()
 
     allocate(bz_surf_reference(0:nx+1,0:ny+1))
 
-    !allocate(fy(0:nx+1,0:ny))
-    !allocate(vpx(-2:nx+2,-2:ny+2)); allocate(vpy(-2:nx+2,-2:ny+2)); !allocate(vpz(-2:nx+2,-2:ny+2))
-    !allocate(jpz1(-2:nx+2,-2:ny+2))
-    ! Establish the actual grid
-    !do i = -2, nx + 2
-    !    xs(i) = x0 + (real(i)/real(nx))*(x1 - x0)
-    !end do
-    !do j = -2, ny + 2
-    !    ys(j) = y0 + (real(j)/real(ny))*(y1 - y0)
-    !end do
-    !do k = -2, nz + 2
-    !    zs(k) = z0 + (real(k)/real(nz))*(z1 - z0)
-    !end do
-
-    !xc(-1:nx+2) = 0.5*(xs(-2:nx+1) + xs(-1:nx+2))
-    !yc(-1:ny+2) = 0.5*(ys(-2:ny+1) + ys(-1:ny+2))
-    !zc(-1:nz+2) = 0.5*(zs(-2:nz+1) + zs(-1:nz+2))
-
     bx = 0.0_num; by = 0.0_num; bz = 0.0_num
 
 END SUBROUTINE allocate_arrays
@@ -202,13 +184,6 @@ SUBROUTINE establish_grid()
     start = (/z_rank*nz+1/),count = (/nz+1/)))
 
     call try(nf90_close(ncid))
-
-    !if (x_down == -1 .and. y_down == -1 .and. z_down == -1) then
-    !    az(2,2,2) = 1.0_num
-    !end if
-
-    !az(2,2,2) = 1.0_num
-
 
     xs(-1) = 2*xs(0) - xs(1); xs(nx+1) = 2*xs(nx) - xs(nx-1)
     ys(-1) = 2*ys(0) - ys(1); ys(ny+1) = 2*ys(ny) - ys(ny-1)
@@ -263,7 +238,6 @@ SUBROUTINE calculate_timestep()
     dt_ideal = cfl*dt_ideal
     print*, 'Ideal dt', dt_ideal
 
-    print*, 'diffusion factor', eta*dt_ideal/dx**2
     !Adjust so there are an integer number of timesteps in between plots
     plot_dt = tmax/(ndiags-1)
     nt = int(ndiags-1)*(int((plot_dt-1d-6)/dt_ideal)+1)

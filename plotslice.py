@@ -93,7 +93,12 @@ for plot_num in range(0,nsnaps,1):
     fname = '%s%04d.nc' % (data_directory, i)
     print('Making plot', i, 'fname', fname)
 
-    fname_next = '%s%04d.nc' % (data_directory, i + 1)
+    if i == nsnaps-1:
+        fname_next = '%s%04d.nc' % (data_directory, i)
+        time.sleep(5.0)
+    else:
+        fname_next = '%s%04d.nc' % (data_directory, i+1)
+
     while not os.path.exists(fname_next):
         time.sleep(0.1)
     try:
@@ -137,7 +142,7 @@ for plot_num in range(0,nsnaps,1):
         bz1 = 0.5*(bz[1:-1,slice_index,1:] + bz[1:-1,slice_index,:-1])
         return 0.5*(bx1**2 + by1**2+ bz1**2)
 
-    if False:
+    if True:
         trace_fieldlines(Grid(),bx,by,bz,save=plot_num,plot_vista = False, plot_notvista = True)
 
     if True:
