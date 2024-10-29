@@ -41,7 +41,7 @@ make
 
 # To run the code 
 
-Before actually running the Fortran code, there is some setup to be done. The python wrapper 'run.py' is used to define various variables (resolutions, boundaries, number of plots etc.), which are then saved to a 'parameters' file and read in to Fortran in real time. The initial condition (PFSS) is also called in this file. I recommend running this on a login node before running the bash script to get Fortran actually going. As is, the code is set up on a 64^3 grid which should produce an eruption and not take too long. 
+Before actually running the Fortran code, there is some setup to be done. The python wrapper 'run.py' is used to define various variables (resolutions, boundaries, number of plots etc.), which are then saved to a 'parameters' file and read in to Fortran in real time. The initial condition (PFSS) is also called in this file. I recommend running this on a login node before running the bash script to get Fortran actually going. As is, the code is set up on a 64^3 grid which should cause the jet to spin up. Eruptions don't seem to want to happen in this model (yet).
 
 ```
 python run.py 0
