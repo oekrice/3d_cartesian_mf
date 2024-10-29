@@ -49,7 +49,7 @@ python run.py 0 1
 
 where the 0 is the `run number', used to differentiate between multiple runs at the same time, and 1 is the number of cores to run on. Generally reasonable even numbers of cores appear to work well enough.
 
-LARE is then run by calling mpiexec or equivalent. Some examples:
+The fortran code is then run by calling mpiexec or equivalent. Some examples:
 
 ```
 /usr/lib64/openmpi/bin/mpiexec -np 1 ./bin/lare3d 0
@@ -71,6 +71,6 @@ python plotslice.py
 ```
 This plots some colourmaps of cuts of things like the density and magnetic field, and also uses the field line tracer from fltrace.py for some visualisation. These are saved in `./plots'. There is an optional pyvista equivalent, which can be activated by setting `plot_vista = True' on line 163, and uncommenting the relevant imports at the top of fltrace.py. But pyvista doesn't work on every machine so it's left off by default.
 
-The plotter can be set to run while LARE is still running, and it will wait in turn for each of the output files to be created. Then it will plot them.
+The plotter can be set to run while the fortran code is still running, and it will wait in turn for each of the output files to be created. Then it will plot them.
 
 
