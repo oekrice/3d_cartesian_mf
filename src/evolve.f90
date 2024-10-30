@@ -7,8 +7,9 @@ MODULE evolve
     USE shared_data
     USE mpi_tools
     USE boundary
+    USE pressure
+
     !USE output
-    !USE pressure
     IMPLICIT NONE
 
 !*******************************************************************************
@@ -20,7 +21,7 @@ SUBROUTINE timestep()
     CALL calculate_magnetic()
 
     !CALL check_solenoidal()
-    !CALL calculate_jp()
+    CALL calculate_jp()
 
     CALL calculate_current()
 
@@ -68,6 +69,10 @@ SUBROUTINE calculate_current()
     jy(0:nx, 0:ny+1,0:nz) = (bx(0:nx,0:ny+1,1:nz+1) - bx(0:nx, 0:ny+1,0:nz))/dz - (bz(1:nx+1,0:ny+1,0:nz) - bz(0:nx,0:ny+1,0:nz))/dx
 
     jz(0:nx, 0:ny,0:nz+1) = (by(1:nx+1,0:ny,0:nz+1) - by(0:nx, 0:ny,0:nz+1))/dx - (bx(0:nx,1:ny+1,0:nz+1) - bx(0:nx,0:ny,0:nz+1))/dy
+
+    !Take away the 'pressure current' at this point, before averagin
+    jx(0:nx+1, 0:ny,0:nz) = jx(0:nx+1, 0:ny,0:nz) - jpx(0:nx+1, 0:ny,0:nz)
+    jy(0:nx, 0:ny+1,0:nz) = jy(0:nx, 0:ny+1,0:nz) - jpy(0:nx, 0:ny+1,0:nz)
 
 END SUBROUTINE calculate_current
 

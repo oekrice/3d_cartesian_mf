@@ -43,14 +43,33 @@ nplots = 600
 ndiags = 600
 
 nu0 = 1.0
-eta = 0.0#1e-3*nu0
+eta = 5e-4*nu0
 
 x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0
 z0 = -0.0; z1 = 24.0
 
 #Variables for the pressure term
-a = 0.0; b = 1.0; deltaz = 0.05; zstar = 0.0
+decay_type = 3  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
+
+if decay_type == 0: #No pressure
+    zstar = 0.0; a = 0.0; b = 0.0; deltaz = 0.0
+
+if decay_type == 1: #exponential decay
+    zstar = np.linspace(0.0,0.3,10)[run//50]*z1
+    b = ystar/np.log(2)
+    a = 0.5
+    deltaz = 0.0*z1
+
+if decay_type == 2: #smooth tanh
+    a = 0.25; b = 1.0
+    zstar = np.linspace(0.0,0.3,10)[run//50]*z1
+    deltaz = 0.1*z1
+
+if decay_type == 3: #sharp tanh
+    a = 0.25; b = 1.0
+    zstar = zstar = 0.3*z1#np.linspace(0.0,0.3,10)[run//50]*z1
+    deltaz = 0.02*z1
 
 #INITIAL LOWER BOUNDARY CONDITION
 #-------------------------------------
@@ -133,6 +152,7 @@ variables[21] = zstar
 
 variables[22] = hflag
 
+variables[23] = decay_type
 
 #SOME FOLDER ADMIN
 #-------------------------------------

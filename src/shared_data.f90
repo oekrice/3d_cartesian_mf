@@ -69,10 +69,11 @@ MODULE shared_data
     REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: voutx, vouty
 
     !Extra arrays for the pressure bits
-    REAL(num), DIMENSION(:,:), ALLOCATABLE :: fy
+    REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: fz
     REAL(num):: a, b, deltaz, zstar
-    REAL(num), DIMENSION(:,:), ALLOCATABLE :: vpx, vpy, vpz
-    REAL(num), DIMENSION(:,:), ALLOCATABLE :: jpz1
+    REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: vpx, vpy, vpz
+    REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: jpx,jpy
+    INTEGER:: decay_type
 
     !Diagnostics
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_time

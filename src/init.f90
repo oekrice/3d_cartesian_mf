@@ -6,8 +6,9 @@ MODULE init
     USE shared_data
     USE mpi_tools
     USE netcdf
+    USE pressure
+
     !USE output
-    !USE pressure
     IMPLICIT NONE
 
 !*******************************************************************************
@@ -43,7 +44,7 @@ SUBROUTINE initialise()
 
     CALL set_shearing()
 
-    !CALL pressure_function()
+    CALL pressure_function()
 
 END SUBROUTINE initialise
 
@@ -96,7 +97,7 @@ SUBROUTINE read_parameters()
     zstar = variables(22)
 
     hamilton_flag = int(variables(23))
-
+    decay_type = int(variables(24))
 
 END SUBROUTINE read_parameters
 
@@ -128,7 +129,6 @@ SUBROUTINE allocate_arrays()
     allocate(bx1(0:nx,0:ny,0:nz)); allocate(by1(0:nx,0:ny,0:nz)); allocate(bz1(0:nx,0:ny,0:nz))
     allocate(ex1(0:nx,0:ny,0:nz)); allocate(ey1(0:nx,0:ny,0:nz)); allocate(ez1(0:nx,0:ny,0:nz))
 
-
     allocate(vx(0:nx,0:ny,0:nz)); allocate(vy(0:nx,0:ny,0:nz)); allocate(vz(0:nx,0:ny,0:nz))
     allocate(vx_surf(0:nx,0:ny)); allocate(vy_surf(0:nx,0:ny))
 
@@ -136,6 +136,11 @@ SUBROUTINE allocate_arrays()
     allocate(soft(0:nx,0:ny,0:nz))
 
     allocate(bz_surf_reference(0:nx+1,0:ny+1))
+
+    !Pressure arrays
+    allocate(fz(0:nx+1,0:ny+1,-1:nz+1)) !Aligned with bz (I'm pretty sure)
+    allocate(jpx(0:nx+1,-1:ny+1,-1:nz+1)); allocate(jpy(-1:nx+1,0:ny+1,-1:nz+1))
+
 
     bx = 0.0_num; by = 0.0_num; bz = 0.0_num
 
