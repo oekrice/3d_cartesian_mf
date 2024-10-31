@@ -69,7 +69,10 @@ class Grid():
 #data_sources = ['./Data_unstratified_64/', './Data_stratified_64/']
 #data_sources = ['./Data/', './Data/']
 
-data_sources = ['/extra/tmp/trcn27/mf3d/001/','/extra/tmp/trcn27/mf3d/002/']
+#data_sources = ['/extra/tmp/trcn27/mf3d/001/','/extra/tmp/trcn27/mf3d/002/']
+data_sources = ['/nobackup/trcn27/mf3d/000/','/nobackup/trcn27/mf3d/001/','/nobackup/trcn27/mf3d/002/','/nobackup/trcn27/mf3d/003/','/nobackup/trcn27/mf3d/004/']
+
+
 i = 0
 
 if len(sys.argv) > 2:
@@ -77,11 +80,11 @@ if len(sys.argv) > 2:
 
 snap_num = 0
 
-cs = ['green', 'red', 'blue']
+cs = ['green', 'red', 'blue', 'orange', 'purple']
 
 for plot_num in range(0, 120):
     ymax = 0.0; ymin = 1e6
-    for source_number in range(2):
+    for source_number in range(5):
 
         data_directory = data_sources[source_number]
 
@@ -174,8 +177,8 @@ for plot_num in range(0, 120):
         null = null_height(bz)
         plt.plot([null, null], [ymin,ymax], linestyle = 'dashed', c = cs[source_number])
 
-    plt.plot([6., 6.], [ymin,ymax], linestyle = 'dotted', c = cs[2])
-    plt.plot([0.005, 0.005], [ymin,ymax], linestyle = 'dotted', c = cs[1])
+    for n in range(5):
+        plt.plot([float(n), float(n)], [ymin,ymax], linestyle = 'dotted', c = cs[n])
     plt.plot([0.0, 0.0], [ymin,ymax], linestyle = 'solid', c = 'black')
     plt.xlabel('Height')
     plt.ylabel('Absolute Lorentz Force')
