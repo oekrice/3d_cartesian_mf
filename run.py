@@ -33,16 +33,16 @@ voutfact = 0.2
 shearfact = 3.7e-5
 eta0 = 0.0
 
-tmax = 600.0
+tmax = 750.0
 
-nx = 64
-ny = 64
-nz = 64
+nx = 128
+ny = 128
+nz = 128
 
-nplots = 120
-ndiags = 120
+nplots = 150
+ndiags = 150
 
-nu0 = 1.0
+nu0 = 0.5
 eta = 5e-4*nu0
 
 x0 = -12.0; x1 = 12.0
@@ -50,16 +50,20 @@ y0 = -12.0; y1 = 12.0
 z0 = -0.0; z1 = 24.0
 
 #Variables for the pressure term
-decay_type = 3  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
+decay_type = 1  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
 
 if decay_type == 0: #No pressure
     zstar = 0.0; a = 0.0; b = 0.0; deltaz = 0.0
 
 if decay_type == 1: #exponential decay
-    zstar = np.linspace(0.0,0.3,10)[run//50]*z1
-    b = ystar/np.log(2)
-    a = 0.5
-    deltaz = 0.0*z1
+    zstar = run#np.linspace(0.0,0.3,10)[run//50]*z1
+    if zstar > 0:
+        b = zstar/np.log(2)
+        a = 0.5
+        deltaz = 0.0*z1
+    else:
+        decay_type = 0
+        zstar = 0.0; a = 0.0; b = 0.0; deltaz = 0.0
 
 if decay_type == 2: #smooth tanh
     a = 0.25; b = 1.0
