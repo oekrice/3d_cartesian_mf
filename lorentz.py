@@ -32,7 +32,7 @@ nx = int(paras[13])
 ny = int(paras[14])
 nz = int(paras[15])
 
-nx= 64; ny = 64; nz = 64
+nx= 128; ny = 128; nz = 128
 
 nsnaps = int(paras[3])
 
@@ -70,7 +70,7 @@ class Grid():
 #data_sources = ['./Data/', './Data/']
 
 #data_sources = ['/extra/tmp/trcn27/mf3d/001/','/extra/tmp/trcn27/mf3d/002/']
-data_sources = ['/nobackup/trcn27/mf3d/000/','/nobackup/trcn27/mf3d/001/','/nobackup/trcn27/mf3d/002/','/nobackup/trcn27/mf3d/003/','/nobackup/trcn27/mf3d/004/']
+data_sources = ['/nobackup/trcn27/mf3d0/000/','/nobackup/trcn27/mf3d0/001/','/nobackup/trcn27/mf3d0/002/','/nobackup/trcn27/mf3d0/003/','/nobackup/trcn27/mf3d0/004/']
 
 
 i = 0
@@ -84,6 +84,7 @@ cs = ['green', 'red', 'blue', 'orange', 'purple']
 
 for plot_num in range(0, 120):
     ymax = 0.0; ymin = 1e6
+    nulls = []
     for source_number in range(5):
 
         data_directory = data_sources[source_number]
@@ -175,10 +176,13 @@ for plot_num in range(0, 120):
         ymin = min(ymin, np.min(lf_slice_avgs[1:-1]))
 
         null = null_height(bz)
-        plt.plot([null, null], [ymin,ymax], linestyle = 'dashed', c = cs[source_number])
+        nulls.append(null)
+        #plt.plot([null, null], [ymin,ymax], linestyle = 'dashed', c = cs[source_number])
 
     for n in range(5):
         plt.plot([float(n), float(n)], [ymin,ymax], linestyle = 'dotted', c = cs[n])
+        plt.plot([nulls[n], nulls[n]], [ymin,ymax], linestyle = 'dashed', c = cs[n])
+
     plt.plot([0.0, 0.0], [ymin,ymax], linestyle = 'solid', c = 'black')
     plt.xlabel('Height')
     plt.ylabel('Absolute Lorentz Force')
