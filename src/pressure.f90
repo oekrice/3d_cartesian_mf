@@ -41,6 +41,7 @@ SUBROUTINE pressure_function()
         end if
     end do
 
+
 END SUBROUTINE pressure_function
 
 SUBROUTINE calculate_jp()
@@ -48,27 +49,37 @@ SUBROUTINE calculate_jp()
     implicit none
 
     jpx(0:nx+1, 0:ny,0:nz) = (fz(0:nx+1,1:ny+1,0:nz)*bz(0:nx+1,1:ny+1,0:nz) - fz(0:nx+1,0:ny,0:nz)*bz(0:nx+1, 0:ny,0:nz))/dy
-
     jpy(0:nx, 0:ny+1,0:nz) = -(fz(1:nx+1,0:ny+1,0:nz)*bz(1:nx+1,0:ny+1,0:nz) - fz(0:nx,0:ny+1,0:nz)*bz(0:nx,0:ny+1,0:nz))/dx
 
-    !jpz1(0:nx, 0:ny) =  (fy(1:nx+1,0:ny)*by(1:nx+1,0:ny) - fy(0:nx,0:ny)*by(0:nx, 0:ny))/dx
+    jpx1(0:nx,0:ny,0:nz) = 0.5_num*(jpx(1:nx+1,0:ny,0:nz) + jpx(0:nx,0:ny,0:nz))
+    jpy1(0:nx,0:ny,0:nz) = 0.5_num*(jpy(0:nx,1:ny+1,0:nz) + jpy(0:nx,0:ny,0:nz))
 
 END SUBROUTINE calculate_jp
 
 SUBROUTINE calculate_pressure()
     !Does the cross product with b, averages to gridpoints and does the softening as for the velocity
+    !It appears that it might be necessary to do this step rather than just adding on to the current.
+    !There must have been a reason why I did it in the 2D cases...
+
+    !Can get nu directly from the velocity calculation, so don't need to do this twice. But this function must come after calculate_velocity.
+
     implicit none
 
-    !REAL(num), DIMENSION(0:nx,0:ny):: gx2, gy2
+    REAL(num), DIMENSION(0:nx,0:ny,0:nz):: vpx, vpy, vpz
 
-    !Can get nu directly from the velocity calculation, so don't need to do this twice. But this function must come after calculate_velocity
-    !gx2(0:nx,0:ny) = -nu0*(jpz1(0:nx,0:ny)*by1(0:nx,0:ny))/nu(0:nx,0:ny)
-    !gy2(0:nx,0:ny) = nu0*(jpz1(0:nx,0:ny)*bx1(0:nx,0:ny))/nu(0:nx,0:ny)
+    !Extra velocity due to the `pressure current'.
+    vpx = nu*(jpy1*bz1 - 0.0_num )/soft
+    vpy = nu*(0.0_num  - jpx1*bz1)/soft
+    vpz = nu*(jpx1*by1 - jpy1*bx1)/soft
 
-    !vx(0:nx,0:ny) = vx(0:nx,0:ny) + gx2(0:nx, 0:ny)
-    !vy(0:nx,0:ny) = vy(0:nx,0:ny) + gy2(0:nx, 0:ny)
+    !Subtract from the already-calculated velocity
+    vx(0:nx,0:ny,0:nz) = vx(0:nx,0:ny,0:nz) - vpx(0:nx, 0:ny,0:nz)
+    vy(0:nx,0:ny,0:nz) = vy(0:nx,0:ny,0:nz) - vpy(0:nx, 0:ny,0:nz)
+    vz(0:nx,0:ny,0:nz) = vz(0:nx,0:ny,0:nz) - vpz(0:nx, 0:ny,0:nz)
 
-    !vx(:,0) = 0.0; vy(:,0) = 0.0
+    if (z_down < 0) then
+        vpx(:,:,0) = 0.0_num; vpy(:,:,0) = 0.0_num; vpz(:,:,0) = 0.0_num
+    end if
 
 END SUBROUTINE calculate_pressure
 

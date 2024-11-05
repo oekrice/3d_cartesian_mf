@@ -30,6 +30,8 @@ SUBROUTINE timestep()
 
     CALL calculate_velocity()
 
+    !CALL calculate_pressure()
+
     CALL calculate_electric()
 
     CALL MPI_Barrier(comm,ierr)  !Wait for t to be broadcast everywhere.
@@ -70,7 +72,6 @@ SUBROUTINE calculate_current()
 
     jz(0:nx, 0:ny,0:nz+1) = (by(1:nx+1,0:ny,0:nz+1) - by(0:nx, 0:ny,0:nz+1))/dx - (bx(0:nx,1:ny+1,0:nz+1) - bx(0:nx,0:ny,0:nz+1))/dy
 
-    !Take away the 'pressure current' at this point, before averaging
     jx(0:nx+1, 0:ny,0:nz) = jx(0:nx+1, 0:ny,0:nz) - jpx(0:nx+1, 0:ny,0:nz)
     jy(0:nx, 0:ny+1,0:nz) = jy(0:nx, 0:ny+1,0:nz) - jpy(0:nx, 0:ny+1,0:nz)
 
@@ -174,8 +175,8 @@ SUBROUTINE calculate_electric()
 
     if (eta > 0) then
         !Determine the current from the magnetic field (after boundary conditions etc.)
-        ex(1:nx, 0:ny,0:nz) = ex(1:nx, 0:ny,0:nz) + eta*jx(1:nx, 0:ny,0:nz)
-        ey(0:nx, 1:ny,0:nz) = ey(0:nx, 1:ny,0:nz) + eta*jy(0:nx, 1:ny,0:nz)
+        ex(1:nx, 0:ny,0:nz) = ex(1:nx, 0:ny,0:nz) + eta*(jx(1:nx, 0:ny,0:nz))! - jpx(1:nx, 0:ny,0:nz))
+        ey(0:nx, 1:ny,0:nz) = ey(0:nx, 1:ny,0:nz) + eta*(jy(0:nx, 1:ny,0:nz))! - jpy(0:nx, 1:ny,0:nz))
         ez(0:nx, 0:ny,1:nz) = ez(0:nx, 0:ny,1:nz) + eta*jz(0:nx, 0:ny,1:nz)
     end if
 

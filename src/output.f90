@@ -24,17 +24,20 @@ SUBROUTINE diagnostics(diag_num)
     real(num), dimension(:,:):: j0(1:nx,1:ny,1:nz)
     real(num), dimension(:,:):: bx0(1:nx,1:ny,1:nz),by0(1:nx,1:ny,1:nz),bz0(1:nx,1:ny,1:nz) !
     real(num), dimension(:,:):: b0(1:nx,1:ny,1:nz)
+    real(num), dimension(:,:):: ex0(1:nx,1:ny,1:nz),ey0(1:nx,1:ny,1:nz),ez0(1:nx,1:ny,1:nz) !
+    real(num), dimension(:,:):: e0(1:nx,1:ny,1:nz)
 
     !real(num), dimension(:,:):: lx0(0:nx-1,0:ny-1), ly0(0:nx-1,0:ny-1),lz0(0:nx-1,0:ny-1) !
     !real(num), dimension(:,:):: l0(0:nx-1,0:ny-1)
     real(num), dimension(:,:):: time(0:nprocs-1), oflux(0:nprocs-1)
-    real(num), dimension(:,:):: sumj(0:nprocs-1)
+    real(num), dimension(:,:):: sumj(0:nprocs-1), sume(0:nprocs-1)
     real(num), dimension(:,:):: energy(0:nprocs-1)
 
     !Allocate diagnostic arrays
     if (diag_num == 0) then
         allocate(diag_time(0:ndiags-1))
         allocate(diag_oflux(0:ndiags-1)); allocate(diag_sumj(0:ndiags-1))
+        allocate(diag_sume(0:ndiags-1))
         allocate(diag_avgj(0:ndiags-1)); allocate(diag_energy(0:ndiags-1))
         allocate(diag_maxlorentz(0:ndiags-1)); allocate(diag_avglorentz(0:ndiags-1))
         diag_oflux = 0.0_num; diag_sumj = 0.0_num; diag_avgj = 0.0_num; diag_energy = 0.0_num
@@ -55,6 +58,13 @@ SUBROUTINE diagnostics(diag_num)
 
     b0 = bx0**2 + by0**2 + bz0**2
 
+    !ELECTRIC FIELD THINGS
+    !CURRENT THINGS
+    ex0 = 0.25_num*(ex(1:nx,0:ny-1,0:nz-1) + ex(1:nx,1:ny,0:nz-1) + ex(1:nx,0:ny-1,1:nz)  + ex(1:nx,0:ny-1,0:nz-1) )
+    ey0 = 0.25_num*(ey(0:nx-1,1:ny,0:nz-1) + ey(1:nx,1:ny,0:nz-1) + ey(0:nx-1,1:ny,1:nz)  + ey(0:nx-1,1:ny,0:nz-1) )
+    ez0 = 0.25_num*(ez(0:nx-1,0:ny-1,1:nz) + ez(1:nx,0:ny-1,1:nz) + ez(0:nx-1,1:ny,1:nz)  + ez(1:nx,1:ny,1:nz) )
+
+    e0 = ex0**2 + ey0**2 + ez0**2
 
     !TIME
     time(proc_num) = t
@@ -65,9 +75,11 @@ SUBROUTINE diagnostics(diag_num)
     !diag_oflux(diag_num) = diag
     CALL MPI_REDUCE(oflux(proc_num), diag_oflux(diag_num), 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
 
-
     sumj(proc_num) = sum(sqrt(j0))*dx*dy*dz
     CALL MPI_REDUCE(sumj(proc_num), diag_sumj(diag_num), 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
+
+    sume(proc_num) = sum(sqrt(e0))*dx*dy*dz
+    CALL MPI_REDUCE(sume(proc_num), diag_sume(diag_num), 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
 
     diag_avgj(diag_num) = diag_sumj(diag_num)/volume_global
 
@@ -95,6 +107,7 @@ SUBROUTINE diagnostics(diag_num)
       print*, 'Time', diag_time(diag_num)
       print*, 'Open Flux', diag_oflux(diag_num)
       print*, 'Total Current', diag_sumj(diag_num)
+      print*, 'Total Efield', diag_sume(diag_num)
       !print*, 'Average Current', diag_avgj(diag_num)
       !print*, 'Magnetic Energy', diag_energy(diag_num)
 

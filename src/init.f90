@@ -140,6 +140,7 @@ SUBROUTINE allocate_arrays()
     !Pressure arrays
     allocate(fz(0:nx+1,0:ny+1,-1:nz+1)) !Aligned with bz (I'm pretty sure)
     allocate(jpx(0:nx+1,-1:ny+1,-1:nz+1)); allocate(jpy(-1:nx+1,0:ny+1,-1:nz+1))
+    allocate(jpx1(0:nx,0:ny,0:nz)); allocate(jpy1(0:nx,0:ny,0:nz))
 
 
     bx = 0.0_num; by = 0.0_num; bz = 0.0_num

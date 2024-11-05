@@ -73,12 +73,14 @@ MODULE shared_data
     REAL(num):: a, b, deltaz, zstar
     REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: vpx, vpy, vpz
     REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: jpx,jpy
+    REAL(num), DIMENSION(:,:,:), ALLOCATABLE :: jpx1,jpy1
     INTEGER:: decay_type
 
     !Diagnostics
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_time
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_oflux
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_sumj
+    REAL(num), DIMENSION(:), ALLOCATABLE:: diag_sume
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_avgj
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_energy
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_maxlorentz
