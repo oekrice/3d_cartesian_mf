@@ -82,7 +82,7 @@ snap_num = 0
 
 cs = ['green', 'red', 'blue', 'orange', 'purple']
 
-for plot_num in range(0, 120):
+for plot_num in range(0, 150):
     ymax = 0.0; ymin = 1e6
     nulls = []
     for source_number in range(5):
@@ -140,8 +140,10 @@ for plot_num in range(0, 120):
             #Determine(roughly) the height of the null point, up to the eruption
             zslice = bz[slice_index,slice_index,:]
             flip_index = np.where(np.sign(zslice[1:])*np.sign(zslice[:-1]) < 0)
-            return 0.5*(zs[flip_index[-1]] + zs[flip_index[-1]+1])
-
+            if len(flip_index > 0):
+                return 0.5*(zs[flip_index[-1]] + zs[flip_index[-1]+1])
+            else
+                return 0.0
         #Calculate Lorentz Force everywhere. Let's average to grid CENTRES because why not?
         jx = (bz[1:-1,1:,:] - bz[1:-1,:-1,:])/dy - (by[1:-1,:,1:] - by[1:-1,:,:-1])/dz
         jy =  (bx[:,1:-1,1:] - bx[:,1:-1,:-1])/dz - (bz[1:,1:-1,:] - bz[:-1,1:-1,:])/dx
