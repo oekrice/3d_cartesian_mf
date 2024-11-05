@@ -12,7 +12,7 @@ PROGRAM main
     IMPLICIT NONE
 
     ! Put some of the major variables in here - things that can be changed occasionally but not in a series of runs
-    cfl  = 0.01
+    cfl  = 0.15
     mf_delta = 1e-4
 
     ! Import the parameters and set up the grid

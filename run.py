@@ -29,21 +29,21 @@ else:
 
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
-voutfact = 0.0#0.2
-shearfact = 0.0#3.7e-5
+voutfact = 0.2
+shearfact = 3.7e-5
 eta0 = 0.0
 
-tmax = 1.0
+tmax = 750.0
 
-nx = 64
-ny = 64
-nz = 64
+nx = 128
+ny = 128
+nz = 128
 
-nplots = 100
-ndiags = 100
+nplots = 150
+ndiags = 150
 
-nu0 = 0.0
-eta = 1.0#5e-4*nu0
+nu0 = 0.5
+eta = 5e-4*nu0
 
 x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0
@@ -71,10 +71,10 @@ if decay_type == 2: #smooth tanh
     deltaz = 0.1*z1
 
 if decay_type == 3: #sharp tanh
-    #a = 0.01*run**2; b = 1.0
-    #zstar = 0.1*z1#np.linspace(0.0,0.3,10)[run//50]*z1
-    zstar = 0.3*z1
-    a = 0.25; b = 1.0
+    a = 0.01*run**2; b = 1.0
+    zstar = 0.1*z1#np.linspace(0.0,0.3,10)[run//50]*z1
+    #zstar = 0.3*z1
+    #a = 0.25; b = 1.0
     deltaz = 0.02*z1
 
 #INITIAL LOWER BOUNDARY CONDITION

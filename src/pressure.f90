@@ -51,6 +51,11 @@ SUBROUTINE calculate_jp()
     jpx(0:nx+1, 0:ny,0:nz) = (fz(0:nx+1,1:ny+1,0:nz)*bz(0:nx+1,1:ny+1,0:nz) - fz(0:nx+1,0:ny,0:nz)*bz(0:nx+1, 0:ny,0:nz))/dy
     jpy(0:nx, 0:ny+1,0:nz) = -(fz(1:nx+1,0:ny+1,0:nz)*bz(1:nx+1,0:ny+1,0:nz) - fz(0:nx,0:ny+1,0:nz)*bz(0:nx,0:ny+1,0:nz))/dx
 
+    !Stop instabilities on the surface by setting the 'pressure diffusion' to zero here
+    if (z_down < 0) then
+        jpx(:,:,0) = 0.0_num; jpy(:,:,0) = 0.0_num
+    end if
+
     jpx1(0:nx,0:ny,0:nz) = 0.5_num*(jpx(1:nx+1,0:ny,0:nz) + jpx(0:nx,0:ny,0:nz))
     jpy1(0:nx,0:ny,0:nz) = 0.5_num*(jpy(0:nx,1:ny+1,0:nz) + jpy(0:nx,0:ny,0:nz))
 
