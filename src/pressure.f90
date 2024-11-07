@@ -22,9 +22,17 @@ SUBROUTINE pressure_function()
 
     do k = 0, nz+1
         if (zstar < 0.01) then
-            if (k == 0) print*, 'Base case, no pressure function'
+            if (k == 0 .and. proc_num == 0) print*, 'Base case, no pressure function'
             fz(:,:,k) = 0.0_num
         else
+            if (k == 0 .and. proc_num == 0) then
+                print*, '___________________'
+                print*, 'Pressure parameters'
+                print*, 'a = ', a
+                print*, 'b = ', b
+                print*, 'zstar = ', zstar
+                print*, 'deltaz = ', deltaz
+            end if
             if (decay_type == 0) then
                 if (k == 0 .and. proc_num == 0) print*, 'Base case, no pressure function'
                     fz(:,:,k) = 0.0_num

@@ -35,9 +35,9 @@ eta0 = 0.0
 
 tmax = 750.0
 
-nx = 128
-ny = 128
-nz = 128
+nx = 96
+ny = 96
+nz = 96
 
 nplots = 150
 ndiags = 150
@@ -72,7 +72,7 @@ if decay_type == 2: #smooth tanh
 
 if decay_type == 3: #sharp tanh
     a = 0.25; b = 1.0
-    zstar = np.linspace(0.0,0.3,10)[run//50]*z1
+    zstar = 0.05*z1*run
     deltaz = 0.02*z1
 
 #INITIAL LOWER BOUNDARY CONDITION
