@@ -142,7 +142,7 @@ for plot_num in range(0, 150):
             flip_index = np.where(np.sign(zslice[1:])*np.sign(zslice[:-1]) < 0)
             if len(flip_index > 0):
                 return 0.5*(zs[flip_index[-1]] + zs[flip_index[-1]+1])
-            else
+            else:
                 return 0.0
         #Calculate Lorentz Force everywhere. Let's average to grid CENTRES because why not?
         jx = (bz[1:-1,1:,:] - bz[1:-1,:-1,:])/dy - (by[1:-1,:,1:] - by[1:-1,:,:-1])/dz
@@ -181,7 +181,7 @@ for plot_num in range(0, 150):
         nulls.append(null)
         #plt.plot([null, null], [ymin,ymax], linestyle = 'dashed', c = cs[source_number])
 
-    for n in range(5):
+    for n in range(len(nulls)):
         plt.plot([float(n), float(n)], [ymin,ymax], linestyle = 'dotted', c = cs[n])
         plt.plot([nulls[n], nulls[n]], [ymin,ymax], linestyle = 'dashed', c = cs[n])
 
