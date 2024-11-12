@@ -15,7 +15,7 @@ CONTAINS
 SUBROUTINE diagnostics(diag_num)
     !Calculates some diagnostics and saves to netcdf file as for the triangle code, which was fairly neat (if i say so myself...). Should make for easy pythonning
     IMPLICIT NONE
-    INTEGER:: diag_num
+    INTEGER:: diag_num, proc_test
     character(len=100):: filename
 
     integer:: id_1, id_2, id_3, id_4, id_5, ncid, nd_id
@@ -27,11 +27,12 @@ SUBROUTINE diagnostics(diag_num)
     real(num), dimension(:,:):: ex0(1:nx,1:ny,1:nz),ey0(1:nx,1:ny,1:nz),ez0(1:nx,1:ny,1:nz) !
     real(num), dimension(:,:):: e0(1:nx,1:ny,1:nz)
 
-    !real(num), dimension(:,:):: lx0(0:nx-1,0:ny-1), ly0(0:nx-1,0:ny-1),lz0(0:nx-1,0:ny-1) !
-    !real(num), dimension(:,:):: l0(0:nx-1,0:ny-1)
     real(num), dimension(:,:):: time(0:nprocs-1), oflux(0:nprocs-1)
     real(num), dimension(:,:):: sumj(0:nprocs-1), sume(0:nprocs-1)
     real(num), dimension(:,:):: energy(0:nprocs-1)
+
+    !Allocate space for the slice, using the global coordinates
+    real(num), dimension(:,:,:):: bz0_global(1:nx_global, 1:ny_global, 1:nz_global)
 
     !Allocate diagnostic arrays
     if (diag_num == 0) then
@@ -40,8 +41,9 @@ SUBROUTINE diagnostics(diag_num)
         allocate(diag_sume(0:ndiags-1))
         allocate(diag_avgj(0:ndiags-1)); allocate(diag_energy(0:ndiags-1))
         allocate(diag_maxlorentz(0:ndiags-1)); allocate(diag_avglorentz(0:ndiags-1))
+        allocate(diag_nulls(0:ndiags-1))
         diag_oflux = 0.0_num; diag_sumj = 0.0_num; diag_avgj = 0.0_num; diag_energy = 0.0_num
-        diag_maxlorentz = 0.0_num; diag_avglorentz = 0.0_num
+        diag_maxlorentz = 0.0_num; diag_avglorentz = 0.0_num; diag_time = 0.0_num; diag_nulls = 0.0_num
     end if
 
     !CURRENT THINGS
@@ -86,21 +88,30 @@ SUBROUTINE diagnostics(diag_num)
     energy(proc_num) = 0.5_num*sum(b0)*dx*dy*dz
     CALL MPI_REDUCE(energy(proc_num), diag_energy(diag_num), 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
 
-    !diag_avgj(diag_num) = diag
+    !Want the null height, but this depends on tricksy MPI stuff. Might have to be smart :(
+    !MPI all the individual processes into bz0_global
+    bz0_global = 0.0_num
+    if (proc_num == 0) then
+    bz0_global(1+nx*x_rank:nx*(x_rank+1), 1+ny*y_rank:ny*(y_rank+1), 1+nz*z_rank:nz*(z_rank+1)) = bz0(1:nx,1:ny,1:nz)
+    end if
+    !CALL MPI_GATHER(bz0_global(1+nx*x_rank:nx*(x_rank+1), 1+ny*y_rank:ny*(y_rank+1), 1+nz*z_rank:nz*(z_rank+1)), bz0_global, nx*ny*nz, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
+!     do proc_test = 1, nprocs-1
+!         if (proc_num == proc_test) then
+!             print*, 'Sending from', proc_test
+!             call mpi_send(bz0(1:nx,1:ny,1:nz), 1, b0_chunk, 0, 0, comm, ierr)
+!             print*, 'Sent from', proc_test
+!         end if
+!     end do
+!     do proc_test = 1, nprocs-1
+!         !Need coordinates of that process. Don't know them...
+!         if (proc_num == 0) then
+!             print*, 'Receiving from', proc_test
+!             call mpi_recv(bz0_global(1+nx*x_rank:nx*(x_rank+1), 1+ny*y_rank:ny*(y_rank+1), 1+nz*z_rank:nz*(z_rank+1)), 1, b0_chunk, proc_test, 0, comm, MPI_STATUS_IGNORE, ierr)
+!         end if
+!     end do
 
-    !diag_energy(diag_num) = diag
+    call MPI_BARRIER(comm, ierr)
 
-    !lx0(0:nx-1,0:ny-1) = (jy0(0:nx-1,0:ny-1)*bz0(0:nx-1,0:ny-1) - !jz0(0:nx-1,0:ny-1)*by0(0:nx-1,0:ny-1))
-    !ly0(0:nx-1,0:ny-1) = (jz0(0:nx-1,0:ny-1)*bx0(0:nx-1,0:ny-1) - !jx0(0:nx-1,0:ny-1)*bz0(0:nx-1,0:ny-1))
-    !lz0(0:nx-1,0:ny-1) = (jx0(0:nx-1,0:ny-1)*by0(0:nx-1,0:ny-1) - j!y0(0:nx-1,0:ny-1)*bx0(0:nx-1,0:ny-1))
-
-    !l0 = lx0**2 + ly0**2 + lz0**2
-
-    !diag = maxval(sqrt(l0))
-    !diag_maxlorentz(diag_num) = diag
-
-    !diag = sqrt(sum(l0))/float(nx*ny)
-    !diag_avglorentz(diag_num) = diag
     if (proc_num == 0) then
       print*, '______________________________________'
       !print*, 'Total current squared', t, diag_sumj(diag_num)
@@ -108,12 +119,11 @@ SUBROUTINE diagnostics(diag_num)
       print*, 'Open Flux', diag_oflux(diag_num)
       print*, 'Total Current', diag_sumj(diag_num)
       print*, 'Total Efield', diag_sume(diag_num)
+      !print*, 'bz0 check', sum(bz0_global)
+
       !print*, 'Average Current', diag_avgj(diag_num)
       !print*, 'Magnetic Energy', diag_energy(diag_num)
 
-    end if
-
-    CALL MPI_BARRIER(comm, ierr)
     !ADMIN
     if (run_number < 10) then
         write (filename, "(A18,I1,A3)") "./diagnostics/run0", int(run_number), ".nc"
@@ -130,8 +140,6 @@ SUBROUTINE diagnostics(diag_num)
     call try(nf90_def_var(ncid, 'sumcurrent', nf90_double, (/nd_id/), id_3))
     call try(nf90_def_var(ncid, 'avgcurrent', nf90_double, (/nd_id/), id_4))
     call try(nf90_def_var(ncid, 'energy', nf90_double, (/nd_id/), id_5))
-    !call try(nf90_def_var(ncid, 'avglorentz', nf90_double, (/nd_id/), id_6))
-    !call try(nf90_def_var(ncid, 'maxlorentz', nf90_double, (/nd_id/), id_7))
 
     call try(nf90_enddef(ncid))
 
@@ -143,8 +151,10 @@ SUBROUTINE diagnostics(diag_num)
     !call try(nf90_put_var(ncid, id_6, diag_avglorentz))
     !call try(nf90_put_var(ncid, id_7, diag_maxlorentz))
 
-
     call try(nf90_close(ncid))
+    end if
+
+    call MPI_BARRIER(comm, ierr)
 
 
 END SUBROUTINE diagnostics

@@ -142,7 +142,7 @@ for plot_num in range(0,nsnaps,1):
         bz1 = 0.5*(bz[1:-1,slice_index,1:] + bz[1:-1,slice_index,:-1])
         return 0.5*(bx1**2 + by1**2+ bz1**2)
 
-    if True:
+    if False:
         trace_fieldlines(Grid(),bx,by,bz,save=plot_num,plot_vista = False, plot_notvista = True)
 
     if True:

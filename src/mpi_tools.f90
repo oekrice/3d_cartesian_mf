@@ -184,6 +184,7 @@ MODULE mpi_tools
         IMPLICIT NONE
         INTEGER:: mpitype
 
+        !Types for the sends in the magnetic boundary conditions
         mpitype = MPI_DATATYPE_NULL
         CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx+2,ny+3,nz+2/), (/nx+2,ny+3,1/), (/0,0,0/), &
             MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
@@ -225,6 +226,17 @@ MODULE mpi_tools
         CALL MPI_TYPE_COMMIT(mpitype, ierr)
 
         bz_xface = mpitype
+
+        !Types for sending an entire chunk of averaged field
+
+        mpitype = MPI_DATATYPE_NULL
+        CALL MPI_TYPE_CREATE_SUBARRAY(3, (/nx_global, ny_global, nz_global/), (/nx,ny,nz/), (/0,0,0/), &
+            MPI_ORDER_FORTRAN, MPI_DOUBLE_PRECISION, mpitype, ierr)
+        CALL MPI_TYPE_COMMIT(mpitype, ierr)
+
+        b0_chunk = mpitype
+
+
 
     END SUBROUTINE mpi_create_types
 

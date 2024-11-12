@@ -85,6 +85,7 @@ MODULE shared_data
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_energy
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_maxlorentz
     REAL(num), DIMENSION(:), ALLOCATABLE:: diag_avglorentz
+    REAL(num), DIMENSION(:), ALLOCATABLE:: diag_nulls
 
     !MPI
     INTEGER:: comm, ierr, MPI_loc(3), mpitag = 1
@@ -95,7 +96,7 @@ MODULE shared_data
     INTEGER :: bx_xface, by_xface, bz_xface, bx_xface1
     INTEGER :: bx_yface, by_yface, bz_yface, by_yface1
     INTEGER :: bx_zface, by_zface, bz_zface, bz_zface1
-
+    INTEGER :: b0_chunk
     !Extras
     REAL(num), DIMENSION(:,:), ALLOCATABLE:: bz_surf_reference
 !*******************************************************************************

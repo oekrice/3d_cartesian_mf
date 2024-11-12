@@ -26,7 +26,6 @@ if os.uname()[1] == 'brillouin.dur.ac.uk':
 else:
     hflag = 1
 
-
 #DYNAMIC SYSTEM PARAMETERS
 #-------------------------------------
 voutfact = 0.2
@@ -40,7 +39,7 @@ ny = 96
 nz = 96
 
 nplots = 150
-ndiags = 150
+ndiags = 750
 
 nu0 = 0.5
 eta = 5e-4*nu0
@@ -49,8 +48,9 @@ x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0
 z0 = -0.0; z1 = 24.0
 
+backfield_angle = 2*run #Angle of background field in degrees.
 #Variables for the pressure term
-decay_type = 3  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
+decay_type = 0  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
 
 if decay_type == 0: #No pressure
     zstar = 0.0; a = 0.0; b = 0.0; deltaz = 0.0
@@ -158,6 +158,9 @@ variables[22] = hflag
 
 variables[23] = decay_type
 
+#Background field angle (degrees from vertical)
+variables[24] = backfield_angle
+
 #SOME FOLDER ADMIN
 #-------------------------------------
 
@@ -205,7 +208,7 @@ class Grid():
 
 if True:
     grid= Grid()
-    init = compute_initial_condition(grid, lbound_pariat, run, background_strength = 1.0, boundary_error_limit = 1e-6, init_filename = './inits/init%03d.nc' % run)
+    init = compute_initial_condition(grid, lbound_pariat, run, background_strength = 1.0, background_angle = backfield_angle, boundary_error_limit = 1e-6, init_filename = './inits/init%03d.nc' % run)
 
     bx = init.bx; by = init.by; bz = init.bz
 

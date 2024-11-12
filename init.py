@@ -6,7 +6,7 @@ from scipy.io import netcdf_file, FortranFile
 
 
 class compute_initial_condition():
-    def __init__(self, grid, lbound_fn, run, background_strength = 0.0, boundary_error_limit = 0.0, init_filename = '/inits/init000.nc'):
+    def __init__(self, grid, lbound_fn, run, background_strength = 0.0, background_angle = 0.0, boundary_error_limit = 0.0, init_filename = '/inits/init000.nc'):
         #use the same grid notation as in the proper diagnostic calculator, even though it can be bodged for now
         print('Calculating initial potential field for given boundary function...')
         self.xs = np.linspace(grid.x0,grid.x1,grid.nx+1)
@@ -114,8 +114,9 @@ class compute_initial_condition():
         self.bx[:,0,:] = self.bx[:,1,:] - self.dy*(self.by[1:,0,:] - self.by[:-1,0,:])/self.dx
         self.bx[:,-1,:] = self.bx[:,-2,:] + self.dy*(self.by[1:,-1,:] - self.by[:-1,-1,:])/self.dx
 
-        self.bz[:,:,:] = self.bz[:,:,:] - background_strength
-        self.bx[:,:,:] = self.bx[:,:,:] - 0.17*background_strength
+        anglerads = np.pi*background_angle/180.
+        self.bz[:,:,:] = self.bz[:,:,:] - np.cos(anglerads)*background_strength
+        self.bx[:,:,:] = self.bx[:,:,:] - np.sin(anglerads)*background_strength
 
         print('')
         print('Potential Field Calculated')
