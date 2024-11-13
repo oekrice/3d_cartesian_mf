@@ -115,8 +115,8 @@ class compute_initial_condition():
         self.bx[:,-1,:] = self.bx[:,-2,:] + self.dy*(self.by[1:,-1,:] - self.by[:-1,-1,:])/self.dx
 
         anglerads = np.pi*background_angle/180.
-        self.bz[:,:,:] = self.bz[:,:,:] - np.cos(anglerads)*background_strength
-        self.bx[:,:,:] = self.bx[:,:,:] - np.sin(anglerads)*background_strength
+        self.bz[:,:,:] = self.bz[:,:,:] - background_strength
+        self.bx[:,:,:] = self.bx[:,:,:] - np.tan(anglerads)*background_strength
 
         print('')
         print('Potential Field Calculated')
