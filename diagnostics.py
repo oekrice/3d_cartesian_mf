@@ -33,8 +33,11 @@ nruns = 6
 nsnaps = 150
 do_nulls = True
 
-for run in [0,1,2,3,4]:
+angles = [0.0,0.01,0.05,0.1,0.5,1.0,5.0,10.0]
 
+for run in [0,1,2,3,4,5,6,7]:
+
+    backfield_angle = angles[run] #Angle of background field in degrees
     paras = np.loadtxt('parameters/variables%03d.txt' % run)
 
     nx = int(paras[1])
@@ -110,7 +113,7 @@ for run in [0,1,2,3,4]:
 
     end = np.sum(energy > 0.)
 
-    im = axs[0,0].plot(time[:end], openflux[:end], label = 'Background tilt = %d degrees' % (run*2))
+    im = axs[0,0].plot(time[:end], openflux[:end], label = 'Background tilt = %d degrees' % (backfield_angle))
     axs[0,0].set_title('Open Flux')
     im = axs[0,1].plot(time[:end], avgcurrent[:end])
     axs[0,1].set_title('Avg. Current')

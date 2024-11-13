@@ -50,9 +50,9 @@ z0 = -0.0; z1 = 24.0
 
 angles = [0.0,0.01,0.05,0.1,0.5,1.0,5.0,10.0]
 
-backfield_angle = angles[run] #Angle of background field in degrees.
+backfield_angle = angles[run-10] #Angle of background field in degrees.
 #Variables for the pressure term
-decay_type = 0  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
+decay_type = 3  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
 
 if decay_type == 0: #No pressure
     zstar = 0.0; a = 0.0; b = 0.0; deltaz = 0.0
@@ -74,7 +74,7 @@ if decay_type == 2: #smooth tanh
 
 if decay_type == 3: #sharp tanh
     a = 0.25; b = 1.0
-    zstar = 0.05*z1*run
+    zstar = 0.2
     deltaz = 0.02*z1
 
 #INITIAL LOWER BOUNDARY CONDITION
