@@ -132,7 +132,7 @@ for pressure in [0,1]:
             axs[1,0].set_title('Magnetic Energy')
 
             if do_nulls:
-                im = axs[1,1].plot(nullts, nulls)
+                im = axs[1,1].plot(nullts, nulls, color = cs[run%10])
                 axs[1,1].set_title('Null Height')
                 plt.ylim(ymin = 0.0)
 
@@ -146,7 +146,7 @@ for pressure in [0,1]:
             axs[1,0].set_title('Magnetic Energy')
 
             if do_nulls:
-                im = axs[1,1].plot(nullts, nulls, linestyle = 'dashed')
+                im = axs[1,1].plot(nullts, nulls, color = cs[run%10], linestyle = 'dashed')
                 axs[1,1].set_title('Null Height')
                 plt.ylim(ymin = 0.0)
 
