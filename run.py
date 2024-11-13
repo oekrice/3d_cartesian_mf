@@ -48,7 +48,9 @@ x0 = -12.0; x1 = 12.0
 y0 = -12.0; y1 = 12.0
 z0 = -0.0; z1 = 24.0
 
-backfield_angle = 2*run #Angle of background field in degrees.
+angles = [0.0,0.01,0.05,0.1,0.5,1.0,5.0,10.0]
+
+backfield_angle = angles[run] #Angle of background field in degrees.
 #Variables for the pressure term
 decay_type = 0  #Decay types -- 0 for none, 1 for exponential, 2/3 for tanh. Same as the 2D cases.
 
