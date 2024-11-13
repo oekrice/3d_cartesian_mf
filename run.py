@@ -32,13 +32,13 @@ voutfact = 0.2
 shearfact = 3.7e-5
 eta0 = 0.0
 
-tmax = 750.0
+tmax = 1500.0
 
-nx = 96
-ny = 96
-nz = 96
+nx = 128
+ny = 128
+nz = 128
 
-nplots = 150
+nplots = 300
 ndiags = 750
 
 nu0 = 0.5

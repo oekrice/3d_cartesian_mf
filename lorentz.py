@@ -32,7 +32,7 @@ nx = int(paras[13])
 ny = int(paras[14])
 nz = int(paras[15])
 
-nx= 128; ny = 128; nz = 128
+nx= 192; ny = 192; nz = 192
 
 nsnaps = int(paras[3])
 
@@ -70,7 +70,7 @@ class Grid():
 #data_sources = ['./Data/', './Data/']
 
 #data_sources = ['/extra/tmp/trcn27/mf3d/001/','/extra/tmp/trcn27/mf3d/002/']
-data_sources = ['/nobackup/trcn27/mf3d0/000/','/nobackup/trcn27/mf3d0/001/','/nobackup/trcn27/mf3d0/002/','/nobackup/trcn27/mf3d0/003/','/nobackup/trcn27/mf3d0/004/']
+data_sources = ['/nobackup/trcn27/mf3d0/000/','/nobackup/trcn27/mf3d0/001/','/nobackup/trcn27/mf3d0/002/','/nobackup/trcn27/mf3d0/003/']
 
 
 i = 0
@@ -85,7 +85,7 @@ cs = ['green', 'red', 'blue', 'orange', 'purple']
 for plot_num in range(0, 150):
     ymax = 0.0; ymin = 1e6
     nulls = []
-    for source_number in range(5):
+    for source_number in range(4):
 
         data_directory = data_sources[source_number]
 
@@ -140,7 +140,7 @@ for plot_num in range(0, 150):
             #Determine(roughly) the height of the null point, up to the eruption
             zslice = bz[slice_index,slice_index,:]
             flip_index = np.where(np.sign(zslice[1:])*np.sign(zslice[:-1]) < 0)
-            if len(flip_index > 0):
+            if len(flip_index[0] > 0):
                 return 0.5*(zs[flip_index[-1]] + zs[flip_index[-1]+1])
             else:
                 return 0.0
@@ -179,6 +179,7 @@ for plot_num in range(0, 150):
 
         null = null_height(bz)
         nulls.append(null)
+        print('null', null)
         #plt.plot([null, null], [ymin,ymax], linestyle = 'dashed', c = cs[source_number])
 
     for n in range(len(nulls)):
