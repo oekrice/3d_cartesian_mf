@@ -109,7 +109,7 @@ for pressure in [0,1]:
                     nulls.append(null[-1])
                 else:
                     nulls.append(np.nan)
-                nullts.append(750*snap/150)
+                nullts.append(1500*snap/100)
 
         fname = './diagnostics/run%02d.nc' % (run)
 
