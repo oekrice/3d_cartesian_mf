@@ -15,7 +15,7 @@ CONTAINS
 SUBROUTINE diagnostics(diag_num)
     !Calculates some diagnostics and saves to netcdf file as for the triangle code, which was fairly neat (if i say so myself...). Should make for easy pythonning
     IMPLICIT NONE
-    INTEGER:: diag_num, proc_test
+    INTEGER:: diag_num
     character(len=100):: filename
 
     integer:: id_1, id_2, id_3, id_4, id_5, ncid, nd_id
@@ -73,7 +73,11 @@ SUBROUTINE diagnostics(diag_num)
     CALL MPI_REDUCE(time(proc_num)/nprocs, diag_time(diag_num), 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
 
     !OPEN FLUX
-    if (z_up < 0) oflux(proc_num) = sum(abs(bz(1:nx,1:ny,nz)))*dx*dy
+    if (z_up < 0) then
+    oflux(proc_num) = sum(abs(bz(1:nx,1:ny,nz)))*dx*dy
+    else
+    oflux(proc_num) = 0.0_num
+    end if
     !diag_oflux(diag_num) = diag
     CALL MPI_REDUCE(oflux(proc_num), diag_oflux(diag_num), 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, comm, ierr)
 
